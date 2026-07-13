@@ -17,26 +17,47 @@ export default function FeedPage() {
     {
       id: 1,
       user: "田中",
+      department: "営業部",
+      industry: "製造業",
       time: "3時間前",
       likes: 24,
-      poem: `上司の指示で　困惑
-       運動会では　トンカツ`,
+      poem: `資料作り
+徹夜で仕上げ
+
+送信後
+誤字に気づいて
+
+おはようございます`,
     },
     {
       id: 2,
       user: "山田",
+      department: "企画部",
+      industry: "IT",
       time: "昨日",
       likes: 41,
-      poem: `気づけば定時　山積み
-       アマゾン奥地　カナヅチ`,
+      poem: `オンライン
+マイクオフのまま
+
+話し続け
+全員無音で
+
+聞こえてますか`,
     },
     {
       id: 3,
       user: "佐藤",
+      department: "人事部",
+      industry: "金融",
       time: "2日前",
       likes: 18,
-      poem: `意見募るも　だんまり
-       ペンギン正座　歯ぎしり`,
+      poem: `資料できた
+安心したら
+
+添付忘れ
+送信ボタンで
+
+心が止まる`,
     },
   ];
 
@@ -44,16 +65,20 @@ export default function FeedPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-[#FEFAF0] pb-24">
+      <main className="min-h-screen bg-[#F8F6F2] pb-24">
 
         <div className="mx-auto max-w-xl px-4 py-6">
 
           {/* タイトル */}
           <div className="mb-6 text-center">
 
-            <h1 className="text-xl font-bold text-gray-800">
-              みんなの「あるある」を楽しもう
+            <h1 className="text-3xl font-bold text-gray-800">
+              ビジネス百人一首
             </h1>
+
+            <p className="mt-2 text-gray-500">
+              みんなの「あるある」を楽しもう
+            </p>
 
           </div>
 
@@ -62,6 +87,11 @@ export default function FeedPage() {
             activeTab={activeTab}
             onChange={setActiveTab}
           />
+
+          {/* 投稿ボタン */}
+          <div className="mb-6">
+            <Button text="🎤 ＋ 一首を詠む" />
+          </div>
 
           {/* 説明 */}
           <p className="mb-8 text-center text-sm text-gray-400">
