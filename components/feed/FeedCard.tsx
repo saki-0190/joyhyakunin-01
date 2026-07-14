@@ -2,8 +2,6 @@ import LikeButton from "./LikeButton";
 
 type FeedCardProps = {
   user: string;
-  department: string;
-  industry: string;
   time: string;
   poem: string;
   likes: number;
