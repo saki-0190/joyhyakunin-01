@@ -71,7 +71,7 @@ export default function GeneratePage() {
 
             <p className="mt-2 text-gray-500">
               あなたのエピソードを
-              ジョイマン風百人一首にしよう！
+              百人一首にしよう！
             </p>
           </div>
 
