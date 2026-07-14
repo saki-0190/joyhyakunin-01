@@ -11,7 +11,7 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "EnJoy百人一首",
+  title: "エンジョイ百人一首",
 };
 
 export default function RootLayout({

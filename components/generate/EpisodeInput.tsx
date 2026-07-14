@@ -26,7 +26,7 @@ export default function EpisodeInput({
         items-center
         justify-center
         rounded-full
-        bg-[#601419]
+        bg-[#891630]
         text-sm
         font-bold
         text-white
@@ -35,7 +35,7 @@ export default function EpisodeInput({
       2
     </span>
 
-    <h2 className="text-xl font-bold text-[#601419]">
+    <h2 className="text-xl font-bold text-[#891630]">
       エピソードを入力
     </h2>
 
@@ -67,9 +67,9 @@ export default function EpisodeInput({
           leading-7
           outline-none
           transition
-          focus:border-[#601419]
+          focus:border-[#891630]
           focus:ring-2
-          focus:ring-[#601419]/20
+          focus:ring-[#891630]/20
         "
       />
 

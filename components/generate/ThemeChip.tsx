@@ -23,8 +23,8 @@ export default function ThemeChip({
         duration-200
         ${
           selected
-            ? "border-[#601419] bg-[#FBEBEC] text-[#601419]"
-            : "border-gray-300 bg-white text-gray-700 hover:border-[#6C63FF] hover:text-[#6C63FF]"
+            ? "border-[#891630] bg-[#FBEBEC] text-[#891630]"
+            : "border-gray-300 bg-white text-gray-700 hover:border-[#891630] hover:text-[#891630]"
         }
       `}
     >

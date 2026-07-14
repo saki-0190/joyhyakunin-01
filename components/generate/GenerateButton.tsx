@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 
 type GenerateButtonProps = {
@@ -7,10 +8,32 @@ type GenerateButtonProps = {
   onClick: () => void;
 };
 
+const loadingMessages = [
+  "リズムを刻んでいます...",
+  "韻を探しています...",
+  "笑いをブレンド中...",
+  "あと少しで完成です...",
+];
+
 export default function GenerateButton({
   loading,
   onClick,
 }: GenerateButtonProps) {
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!loading) {
+      setMessageIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 600);
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   return (
     <button
       onClick={onClick}
@@ -33,14 +56,14 @@ export default function GenerateButton({
         ${
           loading
             ? "cursor-not-allowed bg-gray-400"
-            : "bg-[#601419] hover:bg-[#7A1A21] active:scale-[0.98]"
+            : "bg-[#891630] hover:bg-[#7A1A21] active:scale-[0.98]"
         }
       `}
     >
       {loading ? (
         <>
           <Loader2 size={22} className="animate-spin" />
-          リズムを刻んでいます...
+          <span>{loadingMessages[messageIndex]}</span>
         </>
       ) : (
         <>

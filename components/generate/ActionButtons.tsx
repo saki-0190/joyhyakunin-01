@@ -18,14 +18,15 @@ export default function ActionButtons({
           flex
           items-center
           justify-center
-          gap-2
-          rounded-xl
+          gap-1
+          rounded-lg
           border-2
-          border-[#601419]
+          border-[#891630]
           bg-white
-          py-3
-          font-semibold
-          text-[#601419]
+          px-4
+          py-0
+          font-medium
+          text-[#891630]
           transition
           hover:bg-[#FFF5F5]
         "
@@ -40,10 +41,11 @@ export default function ActionButtons({
           flex
           items-center
           justify-center
-          gap-2
-          rounded-xl
-          bg-[#601419]
-          py-3
+          gap-1
+          rounded-lg
+          bg-[#891630]
+          py-4
+          py-0
           font-semibold
           text-white
           transition

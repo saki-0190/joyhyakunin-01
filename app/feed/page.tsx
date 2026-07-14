@@ -67,7 +67,7 @@ export default function FeedPage() {
 
       <main className="min-h-screen bg-[#F8F6F2] pb-24">
 
-        <div className="mx-auto max-w-xl px-4 py-6">
+        <div className="mx-auto max-w-md px-4 py-6">
 
           {/* タイトル */}
           <div className="mb-6 text-center">

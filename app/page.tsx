@@ -44,7 +44,7 @@ export default function FeedPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-[#FEFAF0] pb-24">
+      <main className="min-h-screen bg-[#FDFBF7] pb-24">
 
         <div className="mx-auto max-w-xl px-4 py-6">
 
@@ -75,8 +75,6 @@ export default function FeedPage() {
               <FeedCard
                 key={post.id}
                 user={post.user}
-                department={post.department}
-                industry={post.industry}
                 time={post.time}
                 poem={post.poem}
                 likes={post.likes}

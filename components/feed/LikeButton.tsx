@@ -26,20 +26,20 @@ export default function LikeButton({
   return (
     <button
       onClick={handleLike}
-      className={`flex items-center gap-2 rounded-lg border px-4 py-2 transition
+      className={`flex items-center gap-1 rounded-lg border px-3 py-1.5 transition
       ${
         liked
-          ? "border-[#601419] bg-[#FBEBEC] text-[#601419]"
+          ? "border-[#891630] bg-[#FBEBEC] text-[#891630]"
           : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
       }`}
     >
-      <ThumbsUp size={18} />
+      <ThumbsUp size={15} />
 
-      <span className="font-medium">
+      <span className="font-medium text-sm ">
         わかる！
       </span>
 
-      <span className="font-bold">
+      <span className="font-bold text-sm">
         {likes}
       </span>
     </button>

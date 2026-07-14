@@ -38,7 +38,6 @@ export default function GeneratePage() {
     setLoading(true);
 
     setTimeout(() => {
-
       setPoem(`上司の指示で
 困惑
 
@@ -54,7 +53,6 @@ export default function GeneratePage() {
       setIllustration(random);
 
       setLoading(false);
-
     }, 2000);
   };
 
@@ -67,8 +65,7 @@ export default function GeneratePage() {
 
           {/* タイトル */}
           <div className="mb-8 text-center">
-
-            <h1 className="text-xl font-bold text-[#601419]">
+            <h1 className="text-xl font-bold text-[#891630]">
               一首を詠む
             </h1>
 
@@ -76,7 +73,6 @@ export default function GeneratePage() {
               あなたのエピソードを
               ジョイマン風百人一首にしよう！
             </p>
-
           </div>
 
           {/* ①テーマ */}
@@ -103,29 +99,18 @@ export default function GeneratePage() {
           {poem && (
             <section className="mt-10">
 
-              <h2 className="mb-5 flex items-center gap-3 text-xl font-bold text-[#601419]">
-
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#601419] text-white">
+              <h2 className="mb-5 flex items-center gap-3 text-xl font-bold text-[#891630]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#891630] text-white">
                   3
                 </span>
 
                 生成された一首
-
               </h2>
 
               <PoemCard
                 poem={poem}
                 illustration={illustration}
               />
-
-<ActionButtons
-  onSave={() => {
-    console.log("保存");
-  }}
-  onPost={() => {
-    console.log("投稿");
-  }}
-/>
 
             </section>
           )}
@@ -162,6 +147,20 @@ export default function GeneratePage() {
               </p>
 
             </section>
+          )}
+
+          {/* アクションボタン */}
+          {poem && (
+            <div className="mt-6">
+              <ActionButtons
+                onSave={() => {
+                  console.log("保存");
+                }}
+                onPost={() => {
+                  console.log("投稿");
+                }}
+              />
+            </div>
           )}
 
         </div>

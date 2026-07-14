@@ -19,8 +19,8 @@ export default function ThemeSelector({
 }: ThemeSelectorProps) {
   return (
     <section className="mb-8">
-      <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#601419]">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#601419] text-sm text-white">
+      <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-[#891630]">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#891630] text-sm text-white">
           1
         </span>
         テーマを選ぶ
