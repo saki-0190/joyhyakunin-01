@@ -34,26 +34,39 @@ export default function GeneratePage() {
     illustrations[0]
   );
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setLoading(true);
 
-    setTimeout(() => {
-      setPoem(`上司の指示で
-困惑
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          theme: selectedTheme,
+          episode,
+        }),
+      });
 
-運動会では
-トンカツ`);
+      if (!res.ok) {
+        throw new Error("生成に失敗しました");
+      }
 
-      // ランダムにイラストを選択
+      const data = await res.json();
+      setPoem(data.poem || "");
+
       const random =
         illustrations[
-          Math.floor(Math.random() * illustrations.length)
+        Math.floor(Math.random() * illustrations.length)
         ];
-
       setIllustration(random);
-
+    } catch (error) {
+      console.error(error);
+      alert("一首の生成に失敗しました。もう一度お試しください。");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -156,8 +169,30 @@ export default function GeneratePage() {
                 onSave={() => {
                   console.log("保存");
                 }}
-                onPost={() => {
-                  console.log("投稿");
+                onPost={async () => {
+                  try {
+                    const res = await fetch("/api/posts", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        user_id: 1,
+                        poem_text: poem,
+                        theme: selectedTheme,
+                        image_url: illustration,
+                      }),
+                    });
+
+                    if (!res.ok) {
+                      throw new Error("投稿に失敗しました");
+                    }
+
+                    alert("投稿しました！");
+                  } catch (error) {
+                    console.error(error);
+                    alert("投稿に失敗しました。もう一度お試しください。");
+                  }
                 }}
               />
             </div>
