@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Header from "@/components/Header";
 import ProfileCard from "@/components/mypage/ProfileCard";
@@ -9,62 +9,133 @@ import MyPoemCard from "@/components/mypage/MyPoemCard";
 
 type TabType = "myPoems" | "likesReceived" | "likesGiven";
 
+type PostItem = {
+  post_id: number;
+  user_id: number;
+  poem_text: string;
+  theme: string;
+  image_url: string;
+  likes_count: number;
+  created_at: string;
+};
+
+type LikeItem = {
+  like_id: number;
+  post: PostItem;
+  created_at: string;
+  liked_by_user_id?: number;
+};
+
+type MypageResponse = {
+  my_posts: PostItem[];
+  my_likes_given: LikeItem[];
+  my_likes_received: LikeItem[];
+};
+
+const USER_ID = 1;
+const USER_NAME = "たなかっち";
+
+function parseUtcDate(value: string) {
+  return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
+}
+
+function formatCreatedAt(createdAt: string, nowMs: number) {
+  const date = parseUtcDate(createdAt);
+  const diffMs = nowMs - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+  if (diffMinutes < 1) return "たった今";
+  if (diffMinutes < 60) return `${diffMinutes}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffHours < 48) return "昨日";
+
+  return `${Math.floor(diffHours / 24)}日前`;
+}
+
 export default function MyPage() {
   const [tab, setTab] = useState<TabType>("myPoems");
+  const [data, setData] = useState<MypageResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
-  // 自分が詠んだ歌
-  const myPoems = [
-    {
-      id: 1,
-      poem: `上司に　困惑
-運動会では　トンカツ`,
-      date: "2025年6月12日",
-      likes: 24,
-    },
-    {
-      id: 2,
-      poem: `気づけば定時　山積み
-アマゾン奥地　カナヅチ`,
-      date: "2025年3月31日",
-      likes: 82,
-    },
-  ];
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
 
-  // わかる！された歌
-  const likedByOthers = [
-    {
-      id: 3,
-      poem: `朝の電車　遅延
-土偶が語る　地縁`,
-      date: "2025年5月20日",
-      likes: 115,
-    },
-  ];
+    return () => clearInterval(timerId);
+  }, []);
 
-  // 自分がわかる！した歌
-  const likedPoems = [
-    {
-      id: 4,
-      poem: `意見募るも　だんまり
-ペンギン正座　歯ぎしり`,
-      date: "2025年4月18日",
-      likes: 36,
-    },
-  ];
+  useEffect(() => {
+    const fetchMypage = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`/api/mypage/${USER_ID}`);
+        if (!res.ok) {
+          throw new Error("マイページ情報の取得に失敗しました");
+        }
+
+        const json = (await res.json()) as MypageResponse;
+        setData(json);
+      } catch (err) {
+        console.error(err);
+        setError("データを取得できませんでした。しばらくしてから再度お試しください。");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMypage();
+  }, []);
+
+  const myPoems = data?.my_posts ?? [];
+  const likedByOthers = data?.my_likes_received ?? [];
+  const likedPoems = data?.my_likes_given ?? [];
 
   const currentList =
     tab === "myPoems"
-      ? myPoems
+      ? myPoems.map((post) => {
+        const label = formatCreatedAt(post.created_at, now);
+        return {
+          id: post.post_id,
+          poem: post.poem_text,
+          time: label,
+          date: label,
+          likes: post.likes_count,
+        };
+      })
       : tab === "likesReceived"
-      ? likedByOthers
-      : likedPoems;
+        ? likedByOthers.map((item) => {
+          const label = formatCreatedAt(item.created_at, now);
+          return {
+            id: item.like_id,
+            poem: item.post.poem_text,
+            time: label,
+            date: label,
+            likes: item.post.likes_count,
+          };
+        })
+        : likedPoems.map((item) => {
+          const label = formatCreatedAt(item.created_at, now);
+          return {
+            id: item.like_id,
+            poem: item.post.poem_text,
+            time: label,
+            date: label,
+            likes: item.post.likes_count,
+          };
+        });
 
   const title =
     tab === "myPoems"
       ? "詠んだ首"
       : tab === "likesReceived"
-      ? "わかる！された首"
-      : "わかる！した首";
+        ? "わかる！された首"
+        : "わかる！した首";
 
   return (
     <>
@@ -74,48 +145,53 @@ export default function MyPage() {
         <div className="mx-auto max-w-md px-4 py-6">
 
           <ProfileCard
-            name="たなかっち"
+            name={USER_NAME}
             image="/images/profile/profile01.png"
             onEdit={() => alert("プロフィール編集")}
           />
 
           <ProfileStats
-            poemCount={12}
-            likesReceived={147}
-            likesGiven={23}
+            poemCount={myPoems.length}
+            likesReceived={likedByOthers.length}
+            likesGiven={likedPoems.length}
             selected={tab}
             onChange={setTab}
           />
 
-          {/* タイトル */}
           <div className="mt-8 mb-4">
-
             <h2 className="text-2xl font-bold text-[#601419]">
               {title}
             </h2>
-
-            <p className="text-sm text-gray-500">
-              {title}一覧
-            </p>
-
+            <p className="text-sm text-gray-500">{title}一覧</p>
           </div>
 
-          {/* 一覧 */}
           <div className="space-y-6">
-
-            {currentList.map((poem) => (
-              <MyPoemCard
-                key={poem.id}
-                poem={poem.poem}
-                date={poem.date}
-                likes={poem.likes}
-                onDownload={() => alert("保存")}
-                onDelete={() => alert("削除")}
-              />
-            ))}
-
+            {loading ? (
+              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+                マイページを読み込み中です...
+              </div>
+            ) : error ? (
+              <div className="rounded-2xl bg-white p-6 text-center text-red-500 shadow-sm">
+                {error}
+              </div>
+            ) : currentList.length > 0 ? (
+              currentList.map((poem) => (
+                <MyPoemCard
+                  key={poem.id}
+                  poem={poem.poem}
+                  date={poem.date}
+                  time={poem.date}
+                  likes={poem.likes}
+                  onDownload={() => alert("保存")}
+                  onDelete={() => alert("削除")}
+                />
+              ))
+            ) : (
+              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+                表示する投稿がありません。
+              </div>
+            )}
           </div>
-
         </div>
       </main>
     </>

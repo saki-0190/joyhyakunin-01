@@ -23,8 +23,8 @@ export default function GenerateButton({
 
   useEffect(() => {
     if (!loading) {
-      setMessageIndex(0);
-      return;
+      const timeout = setTimeout(() => setMessageIndex(0), 0);
+      return () => clearTimeout(timeout);
     }
 
     const interval = setInterval(() => {
@@ -53,10 +53,9 @@ export default function GenerateButton({
         transition-all
         duration-200
 
-        ${
-          loading
-            ? "cursor-not-allowed bg-gray-400"
-            : "bg-[#891630] hover:bg-[#7A1A21] active:scale-[0.98]"
+        ${loading
+          ? "cursor-not-allowed bg-gray-400"
+          : "bg-[#891630] hover:bg-[#7A1A21] active:scale-[0.98]"
         }
       `}
     >

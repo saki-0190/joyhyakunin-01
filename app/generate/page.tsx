@@ -10,6 +10,14 @@ import GenerateButton from "@/components/generate/GenerateButton";
 import PoemCard from "@/components/generate/PoemCard";
 import ActionButtons from "@/components/generate/ActionButtons";
 
+const illustrations = [
+  "/images/characters/character01.png",
+  "/images/characters/character02.png",
+  "/images/characters/character03.png",
+  "/images/characters/character04.png",
+  "/images/characters/character05.png",
+];
+
 export default function GeneratePage() {
   const [selectedTheme, setSelectedTheme] =
     useState("営業あるある");
@@ -20,40 +28,43 @@ export default function GeneratePage() {
 
   const [poem, setPoem] = useState("");
 
-  // イラスト一覧
-  const illustrations = [
-    "/images/characters/character01.png",
-    "/images/characters/character02.png",
-    "/images/characters/character03.png",
-    "/images/characters/character04.png",
-    "/images/characters/character05.png",
-  ];
-
-  // 表示するイラスト
   const [illustration, setIllustration] = useState(
     illustrations[0]
   );
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setLoading(true);
 
-    setTimeout(() => {
-      setPoem(`上司の指示で
-困惑
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          theme: selectedTheme,
+          episode,
+        }),
+      });
 
-運動会では
-トンカツ`);
+      if (!res.ok) {
+        throw new Error("生成に失敗しました");
+      }
 
-      // ランダムにイラストを選択
+      const data = await res.json();
+      setPoem(data.poem || "");
+
       const random =
         illustrations[
-          Math.floor(Math.random() * illustrations.length)
+        Math.floor(Math.random() * illustrations.length)
         ];
-
       setIllustration(random);
-
+    } catch (error) {
+      console.error(error);
+      alert("一首の生成に失敗しました。もう一度お試しください。");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -151,16 +162,33 @@ export default function GeneratePage() {
 
           {/* アクションボタン */}
           {poem && (
-            <div className="mt-6">
-              <ActionButtons
-                onSave={() => {
-                  console.log("保存");
-                }}
-                onPost={() => {
-                  console.log("投稿");
-                }}
-              />
-            </div>
+            <ActionButtons
+              onPost={async () => {
+                try {
+                  const res = await fetch("/api/posts", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      user_id: 1,
+                      poem_text: poem,
+                      theme: selectedTheme,
+                      image_url: illustration,
+                    }),
+                  });
+
+                  if (!res.ok) {
+                    throw new Error("投稿に失敗しました");
+                  }
+
+                  alert("投稿しました！");
+                } catch (error) {
+                  console.error(error);
+                  alert("投稿に失敗しました。もう一度お試しください。");
+                }
+              }}
+            />
           )}
 
         </div>

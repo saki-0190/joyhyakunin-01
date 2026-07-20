@@ -1,6 +1,7 @@
 import LikeButton from "./LikeButton";
 
 type FeedCardProps = {
+  postId: number;
   user: string;
   time: string;
   poem: string;
@@ -8,6 +9,7 @@ type FeedCardProps = {
 };
 
 export default function FeedCard({
+  postId,
   user,
   time,
   poem,
@@ -37,8 +39,8 @@ export default function FeedCard({
       </div>
 
       {/* 一首 */}
-<div
-  className="
+      <div
+        className="
     rounded-2xl
     bg-[#F2F2F2]
     border-2
@@ -47,7 +49,7 @@ export default function FeedCard({
     p-6
     text-[#3B2F2F]
   "
->
+      >
 
         <pre className="whitespace-pre-wrap font-sans text-lg leading-9">
           {poem}
@@ -56,9 +58,9 @@ export default function FeedCard({
       </div>
 
       {/* わかる */}
-<div className="mt-4">
-  <LikeButton initialLikes={likes} />
-</div>
+      <div className="mt-4">
+        <LikeButton postId={postId} initialLikes={likes} />
+      </div>
 
     </div>
   );
