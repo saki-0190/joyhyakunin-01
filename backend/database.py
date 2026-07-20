@@ -7,7 +7,15 @@ SQLALCHEMY_DATABASE_URL = DATABASE_URL or "mysql+pymysql://tech0:Gen12class3@mys
 if not SQLALCHEMY_DATABASE_URL:
     raise ValueError("DATABASE_URL is not configured.")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={
+        "ssl": {
+            "ssl_ca": "/etc/ssl/cert.pem"
+            }
+        }
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

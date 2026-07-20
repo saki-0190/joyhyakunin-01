@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import ProfileCard from "@/components/mypage/ProfileCard";
 import ProfileStats from "@/components/mypage/ProfileStats";
 import MyPoemCard from "@/components/mypage/MyPoemCard";
+import { useRouter } from "next/navigation";
 
 type TabType = "myPoems" | "likesReceived" | "likesGiven";
 
@@ -32,9 +33,6 @@ type MypageResponse = {
   my_likes_received: LikeItem[];
 };
 
-const USER_ID = 1;
-const USER_NAME = "たなかっち";
-
 function parseUtcDate(value: string) {
   return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
 }
@@ -54,13 +52,26 @@ function formatCreatedAt(createdAt: string, nowMs: number) {
 }
 
 export default function MyPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ id: number; email: string; nickname: string } | null>(null);
   const [tab, setTab] = useState<TabType>("myPoems");
   const [data, setData] = useState<MypageResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
+  // ログイン情報を読み込む
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      router.push("/login"); // 未ログインならログインページへ
+    }
+  }, []);
+
+  // 時刻更新
+   useEffect(() => {
     const timerId = setInterval(() => {
       setNow(Date.now());
     }, 60000);
@@ -68,13 +79,15 @@ export default function MyPage() {
     return () => clearInterval(timerId);
   }, []);
 
+  // マイページデータ取得
   useEffect(() => {
     const fetchMypage = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(`/api/mypage/${USER_ID}`);
+        if (!user) return;
+        const res = await fetch(`/api/mypage/${user.id}`);
         if (!res.ok) {
           throw new Error("マイページ情報の取得に失敗しました");
         }
@@ -90,7 +103,7 @@ export default function MyPage() {
     };
 
     fetchMypage();
-  }, []);
+  }, [user]);
 
   const myPoems = data?.my_posts ?? [];
   const likedByOthers = data?.my_likes_received ?? [];
@@ -145,10 +158,11 @@ export default function MyPage() {
         <div className="mx-auto max-w-md px-4 py-6">
 
           <ProfileCard
-            name={USER_NAME}
+            name={user?.nickname ?? "ゲスト"}
             image="/images/profile/profile01.png"
             onEdit={() => alert("プロフィール編集")}
           />
+
 
           <ProfileStats
             poemCount={myPoems.length}
