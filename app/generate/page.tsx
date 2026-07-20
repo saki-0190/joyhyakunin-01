@@ -10,6 +10,14 @@ import GenerateButton from "@/components/generate/GenerateButton";
 import PoemCard from "@/components/generate/PoemCard";
 import ActionButtons from "@/components/generate/ActionButtons";
 
+const illustrations = [
+  "/images/characters/character01.png",
+  "/images/characters/character02.png",
+  "/images/characters/character03.png",
+  "/images/characters/character04.png",
+  "/images/characters/character05.png",
+];
+
 export default function GeneratePage() {
   const [selectedTheme, setSelectedTheme] =
     useState("営業あるある");
@@ -20,16 +28,6 @@ export default function GeneratePage() {
 
   const [poem, setPoem] = useState("");
 
-  // イラスト一覧
-  const illustrations = [
-    "/images/characters/character01.png",
-    "/images/characters/character02.png",
-    "/images/characters/character03.png",
-    "/images/characters/character04.png",
-    "/images/characters/character05.png",
-  ];
-
-  // 表示するイラスト
   const [illustration, setIllustration] = useState(
     illustrations[0]
   );
@@ -164,38 +162,33 @@ export default function GeneratePage() {
 
           {/* アクションボタン */}
           {poem && (
-            <div className="mt-6">
-              <ActionButtons
-                onSave={() => {
-                  console.log("保存");
-                }}
-                onPost={async () => {
-                  try {
-                    const res = await fetch("/api/posts", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        user_id: 1,
-                        poem_text: poem,
-                        theme: selectedTheme,
-                        image_url: illustration,
-                      }),
-                    });
+            <ActionButtons
+              onPost={async () => {
+                try {
+                  const res = await fetch("/api/posts", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      user_id: 1,
+                      poem_text: poem,
+                      theme: selectedTheme,
+                      image_url: illustration,
+                    }),
+                  });
 
-                    if (!res.ok) {
-                      throw new Error("投稿に失敗しました");
-                    }
-
-                    alert("投稿しました！");
-                  } catch (error) {
-                    console.error(error);
-                    alert("投稿に失敗しました。もう一度お試しください。");
+                  if (!res.ok) {
+                    throw new Error("投稿に失敗しました");
                   }
-                }}
-              />
-            </div>
+
+                  alert("投稿しました！");
+                } catch (error) {
+                  console.error(error);
+                  alert("投稿に失敗しました。もう一度お試しください。");
+                }
+              }}
+            />
           )}
 
         </div>

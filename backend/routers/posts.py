@@ -5,13 +5,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 # ============================================================
-# backend パッケージ内の database.py
-# main.py が backend.main として起動されるため、
-# routers/posts.py から見た database.py は backend.database になる
-# ============================================================
-from backend.database import SessionLocal
-
-# ============================================================
 # backend パッケージ内の models.py
 # ============================================================
 from backend.models import Post
@@ -20,18 +13,9 @@ from backend.models import Post
 # backend パッケージ内の schemas.py
 # ============================================================
 from backend.schemas import PostCreate, Post as PostSchema
+from backend.deps import get_db
 
 router = APIRouter()
-
-# ============================================================
-# DB セッション取得
-# ============================================================
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # ============================================================
 # 投稿API（POST /posts）

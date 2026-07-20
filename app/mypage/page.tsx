@@ -35,13 +35,18 @@ type MypageResponse = {
 const USER_ID = 1;
 const USER_NAME = "たなかっち";
 
-function formatCreatedAt(createdAt: string) {
-  const date = new Date(createdAt);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+function parseUtcDate(value: string) {
+  return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
+}
+
+function formatCreatedAt(createdAt: string, nowMs: number) {
+  const date = parseUtcDate(createdAt);
+  const diffMs = nowMs - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 
-  if (diffHours < 1) return "たった今";
+  if (diffMinutes < 1) return "たった今";
+  if (diffMinutes < 60) return `${diffMinutes}分前`;
   if (diffHours < 24) return `${diffHours}時間前`;
   if (diffHours < 48) return "昨日";
 
@@ -53,6 +58,15 @@ export default function MyPage() {
   const [data, setData] = useState<MypageResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
+
+    return () => clearInterval(timerId);
+  }, []);
 
   useEffect(() => {
     const fetchMypage = async () => {
@@ -84,25 +98,37 @@ export default function MyPage() {
 
   const currentList =
     tab === "myPoems"
-      ? myPoems.map((post) => ({
-        id: post.post_id,
-        poem: post.poem_text,
-        date: formatCreatedAt(post.created_at),
-        likes: post.likes_count,
-      }))
+      ? myPoems.map((post) => {
+        const label = formatCreatedAt(post.created_at, now);
+        return {
+          id: post.post_id,
+          poem: post.poem_text,
+          time: label,
+          date: label,
+          likes: post.likes_count,
+        };
+      })
       : tab === "likesReceived"
-        ? likedByOthers.map((item) => ({
-          id: item.like_id,
-          poem: item.post.poem_text,
-          date: formatCreatedAt(item.created_at),
-          likes: item.post.likes_count,
-        }))
-        : likedPoems.map((item) => ({
-          id: item.like_id,
-          poem: item.post.poem_text,
-          date: formatCreatedAt(item.created_at),
-          likes: item.post.likes_count,
-        }));
+        ? likedByOthers.map((item) => {
+          const label = formatCreatedAt(item.created_at, now);
+          return {
+            id: item.like_id,
+            poem: item.post.poem_text,
+            time: label,
+            date: label,
+            likes: item.post.likes_count,
+          };
+        })
+        : likedPoems.map((item) => {
+          const label = formatCreatedAt(item.created_at, now);
+          return {
+            id: item.like_id,
+            poem: item.post.poem_text,
+            time: label,
+            date: label,
+            likes: item.post.likes_count,
+          };
+        });
 
   const title =
     tab === "myPoems"
@@ -154,6 +180,7 @@ export default function MyPage() {
                   key={poem.id}
                   poem={poem.poem}
                   date={poem.date}
+                  time={poem.date}
                   likes={poem.likes}
                   onDownload={() => alert("保存")}
                   onDelete={() => alert("削除")}

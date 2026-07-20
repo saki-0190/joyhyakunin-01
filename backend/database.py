@@ -1,20 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from backend.config import DATABASE_URL
 
-# SQLite のローカルDB
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = DATABASE_URL or "mysql+pymysql://tech0:Gen12class3@mysql-gen12-class3.mysql.database.azure.com:3306/joyhyakunin"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+if not SQLALCHEMY_DATABASE_URL:
+    raise ValueError("DATABASE_URL is not configured.")
 
+engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
 
-# ORM モデルを読み込んでからテーブルを作成する
-# これにより、models.py に定義されたテーブルが create_all で登録される
 import backend.models  # noqa: F401
-
-# テーブルが存在しない場合は自動作成
 Base.metadata.create_all(bind=engine)

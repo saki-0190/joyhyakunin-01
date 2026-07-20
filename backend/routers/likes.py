@@ -1,23 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-# backend パッケージ内の database.py
-from backend.database import SessionLocal
-
 # backend パッケージ内の models.py
 from backend.models import Like, Post
 
 # backend パッケージ内の schemas.py
 from backend.schemas import Like as LikeSchema
+from backend.deps import get_db
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/posts/{post_id}/like", response_model=LikeSchema)
 def toggle_like(post_id: int, user_id: int, db: Session = Depends(get_db)):

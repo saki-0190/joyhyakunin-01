@@ -1,24 +1,14 @@
 # ============================================================
 # マイページ API
 # ============================================================
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-# backend パッケージの DB / モデル / スキーマ
-from backend.database import SessionLocal
+# backend パッケージの DB / モデル
 from backend.models import Post, Like
+from backend.deps import get_db
 
 router = APIRouter()
-
-# ============================================================
-# DB セッション取得
-# ============================================================
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # ============================================================
 # マイページ API
@@ -27,22 +17,24 @@ def get_db():
 @router.get("/mypage/{user_id}")
 def get_mypage(user_id: int, db: Session = Depends(get_db)):
 
-    # ① 自分の投稿一覧
-    my_posts = db.query(Post).filter(Post.user_id == user_id).all()
+    # ① 自分の投稿一覧（新しい順）
+    my_posts = db.query(Post).filter(Post.user_id == user_id).order_by(Post.created_at.desc()).all()
 
-    # ② 自分が押した「わかる！」一覧
+    # ② 自分が押した「わかる！」一覧（新しい順）
     my_likes_given = (
         db.query(Like, Post)
         .join(Post, Like.post_id == Post.post_id)
         .filter(Like.user_id == user_id)
+        .order_by(Like.created_at.desc())
         .all()
     )
 
-    # ③ 自分が受け取った「わかる！」一覧
+    # ③ 自分が受け取った「わかる！」一覧（新しい順）
     my_likes_received = (
         db.query(Like, Post)
         .join(Post, Like.post_id == Post.post_id)
         .filter(Post.user_id == user_id)
+        .order_by(Like.created_at.desc())
         .all()
     )
 

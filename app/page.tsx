@@ -17,10 +17,19 @@ type PostItem = {
 };
 
 export default function FeedPage() {
-  const [activeTab, setActiveTab] = useState<"popular" | "latest">("popular");
+  const [activeTab, setActiveTab] = useState<"popular" | "latest">("latest");
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
+
+    return () => clearInterval(timerId);
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -47,13 +56,18 @@ export default function FeedPage() {
     fetchPosts();
   }, [activeTab]);
 
-  function formatTime(createdAt: string) {
-    const date = new Date(createdAt);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+  function parseUtcDate(value: string) {
+    return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
+  }
+
+  function formatTime(createdAt: string, nowMs: number) {
+    const date = parseUtcDate(createdAt);
+    const diffMs = nowMs - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 
-    if (diffHours < 1) return "たった今";
+    if (diffMinutes < 1) return "たった今";
+    if (diffMinutes < 60) return `${diffMinutes}分前`;
     if (diffHours < 24) return `${diffHours}時間前`;
     if (diffHours < 48) return "昨日";
 
@@ -93,7 +107,7 @@ export default function FeedPage() {
                   key={post.post_id}
                   postId={post.post_id}
                   user={`ユーザー${post.user_id}`}
-                  time={formatTime(post.created_at)}
+                  time={formatTime(post.created_at, now)}
                   poem={post.poem_text}
                   likes={post.likes_count}
                 />
