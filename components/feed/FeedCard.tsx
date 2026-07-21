@@ -1,8 +1,10 @@
 import LikeButton from "./LikeButton";
+import Image from "next/image";
 
 type FeedCardProps = {
   postId: number;
   user: string;
+  userImage: string;
   time: string;
   poem: string;
   likes: number;
@@ -11,6 +13,7 @@ type FeedCardProps = {
 export default function FeedCard({
   postId,
   user,
+  userImage,
   time,
   poem,
   likes,
@@ -22,9 +25,13 @@ export default function FeedCard({
       <div className="mb-4 flex items-start gap-3">
 
         {/* アイコン */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-2xl">
-          🎤
-        </div>
+        <Image
+          src={userImage}
+          alt={user}
+          width={48}
+          height={48}
+          className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover"
+        />
 
         <div>
           <h3 className="font-bold text-gray-800">

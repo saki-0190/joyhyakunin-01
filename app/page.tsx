@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeedCard from "@/components/feed/FeedCard";
 import FeedTabs from "@/components/feed/FeedTabs";
+import { formatRelativeTime } from "@/lib/time";
 
 type PostItem = {
   post_id: number;
@@ -14,6 +15,8 @@ type PostItem = {
   image_url: string;
   likes_count: number;
   created_at: string;
+  author_name?: string;
+  author_image_url?: string;
 };
 
 export default function FeedPage() {
@@ -56,24 +59,6 @@ export default function FeedPage() {
     fetchPosts();
   }, [activeTab]);
 
-  function parseUtcDate(value: string) {
-    return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
-  }
-
-  function formatTime(createdAt: string, nowMs: number) {
-    const date = parseUtcDate(createdAt);
-    const diffMs = nowMs - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    if (diffMinutes < 1) return "たった今";
-    if (diffMinutes < 60) return `${diffMinutes}分前`;
-    if (diffHours < 24) return `${diffHours}時間前`;
-    if (diffHours < 48) return "昨日";
-
-    return `${Math.floor(diffHours / 24)}日前`;
-  }
-
   return (
     <>
       <Header />
@@ -106,8 +91,9 @@ export default function FeedPage() {
                 <FeedCard
                   key={post.post_id}
                   postId={post.post_id}
-                  user={`ユーザー${post.user_id}`}
-                  time={formatTime(post.created_at, now)}
+                  user={post.author_name ?? `ユーザー${post.user_id}`}
+                  userImage={post.author_image_url ?? "/images/profile/profile01.png"}
+                  time={formatRelativeTime(post.created_at, now)}
                   poem={post.poem_text}
                   likes={post.likes_count}
                 />

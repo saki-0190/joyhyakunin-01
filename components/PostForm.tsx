@@ -1,18 +1,31 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 
 export default function PostForm() {
+    const router = useRouter();
     const [poemText, setPoemText] = useState("");
     const [theme, setTheme] = useState("");
     const [imageUrl, setImageUrl] = useState("");
-    const [userId] = useState(1); // 仮のユーザーID
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        const user = getStoredUser();
+        const authHeader = getAuthorizationHeader();
+        if (!user || !authHeader.Authorization) {
+            router.push("/login");
+            return;
+        }
+
+        setLoading(true);
+        setMessage(null);
+
         const payload = {
-            user_id: userId,
             poem_text: poemText,
             theme: theme,
             image_url: imageUrl,
@@ -23,6 +36,7 @@ export default function PostForm() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...authHeader,
                 },
                 body: JSON.stringify(payload),
             });
@@ -31,13 +45,15 @@ export default function PostForm() {
                 throw new Error("投稿に失敗しました");
             }
 
-            alert("投稿しました！");
+            setMessage({ type: "success", text: "投稿しました！" });
             setPoemText("");
             setTheme("");
             setImageUrl("");
         } catch (error) {
             console.error(error);
-            alert("投稿に失敗しました");
+            setMessage({ type: "error", text: "投稿に失敗しました" });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -74,10 +90,17 @@ export default function PostForm() {
 
             <button
                 type="submit"
+                disabled={loading}
                 className="px-4 py-2 bg-blue-600 text-white rounded"
             >
-                投稿する
+                {loading ? "投稿中..." : "投稿する"}
             </button>
+
+            {message && (
+                <p className={message.type === "error" ? "text-sm text-red-600" : "text-sm text-green-700"}>
+                    {message.text}
+                </p>
+            )}
         </form>
     );
 }

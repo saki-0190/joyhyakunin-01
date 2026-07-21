@@ -4,13 +4,17 @@ import Image from "next/image";
 import { Pencil } from "lucide-react";
 
 type ProfileCardProps = {
-  name: string;
+  nickname: string;
+  fullName: string;
+  industry: string;
   image: string;
   onEdit: () => void;
 };
 
 export default function ProfileCard({
-  name,
+  nickname,
+  fullName,
+  industry,
   image,
   onEdit,
 }: ProfileCardProps) {
@@ -25,7 +29,7 @@ export default function ProfileCard({
           {/* アイコン */}
           <Image
             src={image}
-            alt={name}
+            alt={nickname}
             width={80}
             height={80}
             className="rounded-full border-4 border-[#F6E5EA] object-cover"
@@ -34,11 +38,11 @@ export default function ProfileCard({
           <div>
 
             <h2 className="text-2xl font-bold text-[#601419]">
-              {name}
+              {nickname}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              田中誠一/製造業
+              {fullName || "未設定"}/{industry || "未設定"}
             </p>
 
           </div>

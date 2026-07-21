@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class PostCreate(BaseModel):
-    user_id: int
     poem_text: str
     theme: str
     image_url: str

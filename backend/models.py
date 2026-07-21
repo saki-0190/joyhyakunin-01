@@ -59,5 +59,8 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     nickname = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=False, default="")
+    industry = Column(String(255), nullable=False, default="")
+    profile_image_url = Column(String(500), nullable=False, default="/images/profile/profile01.png")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())

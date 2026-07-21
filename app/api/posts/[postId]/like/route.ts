@@ -1,0 +1,41 @@
+import { NextRequest, NextResponse } from "next/server";
+
+const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+
+type RouteContext = {
+    params: Promise<{ postId: string }>;
+};
+
+export async function POST(request: NextRequest, context: RouteContext) {
+    try {
+        const { postId } = await context.params;
+        const authorization = request.headers.get("authorization");
+
+        const response = await fetch(`${BACKEND_URL}/posts/${postId}/like`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                ...(authorization ? { Authorization: authorization } : {}),
+            },
+            cache: "no-store",
+        });
+
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            const json = await response.json();
+            return NextResponse.json(json, { status: response.status });
+        }
+
+        const text = await response.text();
+        return NextResponse.json(
+            { error: text || "いいね処理に失敗しました" },
+            { status: response.status },
+        );
+    } catch (error) {
+        console.error("Failed to toggle like via backend:", error);
+        return NextResponse.json(
+            { error: "バックエンドに接続できません。サーバー起動を確認してください。" },
+            { status: 503 },
+        );
+    }
+}
