@@ -111,7 +111,7 @@ export default function GeneratePage() {
             <section className="mt-10">
 
               <h2 className="mb-5 flex items-center gap-3 text-xl font-bold text-[#891630]">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#891630] text-white">
+                <span className="flex h-7 w-7 items-center  text-sm justify-center rounded-full bg-[#891630] text-white">
                   3
                 </span>
 
@@ -154,7 +154,7 @@ export default function GeneratePage() {
               />
 
               <p className="mt-2 text-sm text-gray-500">
-                💡 生成結果は自由に編集できます。
+                生成結果は自由に編集できます。
               </p>
 
             </section>
@@ -163,6 +163,7 @@ export default function GeneratePage() {
           {/* アクションボタン */}
           {poem && (
             <ActionButtons
+              onSave={() => alert("画像を保存しました")}
               onPost={async () => {
                 try {
                   const res = await fetch("/api/posts", {
