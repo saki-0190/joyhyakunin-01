@@ -1,20 +1,20 @@
-"use client";
-
+import Image from "next/image";
 import {
   Download,
   Trash2,
   ThumbsUp,
 } from "lucide-react";
 
-import PoemCard from "@/components/common/PoemCard";
-
 type MyPoemCardProps = {
   poem: string;
   date: string;
   likes: number;
 
+  user?: string;
+  time?: string;
+  avatar?: string;
+
   onDownload: () => void;
-  onEdit?: () => void;
   onDelete: () => void;
 };
 
@@ -22,25 +22,80 @@ export default function MyPoemCard({
   poem,
   date,
   likes,
+  user = "たなかっち",
+  time = "3時間前",
+  avatar = "/images/profile/profile01.png",
   onDownload,
-  onEdit,
   onDelete,
 }: MyPoemCardProps) {
   return (
-    <div className="bg-white p-2">
+    <div className="overflow-hidden rounded-2xl bg-white shadow-md">
+
+      {/* ユーザー情報 */}
+      <div className="flex items-center gap-3 p-4">
+
+        <Image
+          src={avatar}
+          alt={user}
+          width={48}
+          height={48}
+          className="rounded-full bg-[#F4EEFF] object-cover"
+        />
+
+        <div>
+          <h3 className="text-xl font-bold text-[#1F2A44]">
+            {user}
+          </h3>
+
+          <p className="text-sm text-gray-400">
+            {time}
+          </p>
+        </div>
+
+      </div>
+
+      {/* 百人一首カード */}
+      <div className="px-4">
+
+        <div
+          className="
+            rounded-2xl
+            border-4
+            border-[#D9C7A1]
+            bg-[#FFFDF8]
+            p-6
+          "
+        >
+
+          <pre
+            className="
+              whitespace-pre-wrap
+              text-center
+              text-xl
+              leading-[2]
+              font-serif
+              text-[#3B2F2F]
+            "
+          >
+            {poem}
+          </pre>
+
+        </div>
+
+      </div>
 
       {/* 日付・いいね */}
-      <div className="pb-4 flex items-center justify-between">
+      <div className="flex items-center justify-between px-6 py-3">
 
-        <span className="text-sm text-[#7F7F7F]">
+        <p className="text-base text-gray-500">
           {date}
-        </span>
+        </p>
 
-        <div className="flex items-center gap-2 text-[#7F7F7F]">
+        <div className="flex items-center gap-1 text-gray-500">
 
-          <ThumbsUp size={16} />
+          <ThumbsUp size={18} />
 
-          <span className="text-sm">
+          <span className="text-base">
             {likes}
           </span>
 
@@ -48,13 +103,11 @@ export default function MyPoemCard({
 
       </div>
 
-      {/* 歌札 */}
-      <div className="flex justify-center">
-        <PoemCard poem={poem} />
-      </div>
+      {/* 区切り線 */}
+      <div className="mx-4 border-t border-gray-200" />
 
       {/* ボタン */}
-      <div className="grid grid-cols-2 gap-3 py-6 px-5">
+      <div className="grid grid-cols-2 gap-3 p-4">
 
         <button
           onClick={onDownload}
@@ -64,18 +117,18 @@ export default function MyPoemCard({
             justify-center
             gap-2
             rounded-xl
-            border-2
-            border-[#891630]
+            border
+            border-[#601419]
             bg-white
-            py-3
-            text-sm
+            py-2
+            text-base
             font-semibold
-            text-[#891630]
+            text-[#601419]
             transition
-            hover:bg-[#FFF6F7]
+            hover:bg-[#FFF5F5]
           "
         >
-          <Download size={16} />
+          <Download size={18} />
           保存
         </button>
 
@@ -87,16 +140,16 @@ export default function MyPoemCard({
             justify-center
             gap-2
             rounded-xl
-            bg-[#891630]
-            py-3
-            text-sm
+            bg-[#601419]
+            py-2
+            text-base
             font-semibold
             text-white
             transition
-            hover:bg-[#741225]
+            hover:bg-[#7A1A21]
           "
         >
-          <Trash2 size={16} />
+          <Trash2 size={18} />
           削除
         </button>
 

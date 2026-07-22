@@ -9,8 +9,8 @@ type GenerateButtonProps = {
 };
 
 const loadingMessages = [
-  "韻を探しています...",
   "リズムを刻んでいます...",
+  "韻を探しています...",
   "笑いをブレンド中...",
   "あと少しで完成です...",
 ];
@@ -20,10 +20,11 @@ export default function GenerateButton({
   onClick,
 }: GenerateButtonProps) {
   const [messageIndex, setMessageIndex] = useState(0);
+
   useEffect(() => {
     if (!loading) {
-      setMessageIndex(0);
-      return;
+      const timeout = setTimeout(() => setMessageIndex(0), 0);
+      return () => clearTimeout(timeout);
     }
 
     const interval = setInterval(() => {
@@ -52,10 +53,9 @@ export default function GenerateButton({
         transition-all
         duration-200
 
-        ${
-          loading
-            ? "cursor-not-allowed bg-gray-400"
-            : "bg-[#891630] hover:bg-[#7A1A21] active:scale-[0.98]"
+        ${loading
+          ? "cursor-not-allowed bg-gray-400"
+          : "bg-[#891630] hover:bg-[#7A1A21] active:scale-[0.98]"
         }
       `}
     >
