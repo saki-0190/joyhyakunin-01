@@ -71,18 +71,8 @@ export default function MyPage() {
     industry?: string;
     profile_image_url?: string;
     access_token?: string;
-  } | null>(() => {
-    const stored = getStoredUser();
-    if (!stored) {
-      return null;
-    }
-
-    return {
-      ...stored,
-      email: stored.email ?? "",
-      nickname: stored.nickname ?? "",
-    };
-  });
+  } | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editNickname, setEditNickname] = useState("");
   const [editEmail, setEditEmail] = useState("");
@@ -101,6 +91,22 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => {
+      const stored = getStoredUser();
+      if (stored) {
+        setUser({
+          ...stored,
+          email: stored.email ?? "",
+          nickname: stored.nickname ?? "",
+        });
+      }
+      setAuthReady(true);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   useEffect(() => {
     if (!toast) return;
@@ -269,6 +275,10 @@ export default function MyPage() {
 
   // マイページデータ取得
   useEffect(() => {
+    if (!authReady) {
+      return;
+    }
+
     const userId = user?.id;
 
     const fetchMypage = async () => {
@@ -322,7 +332,7 @@ export default function MyPage() {
     };
 
     fetchMypage();
-  }, [user?.id]);
+  }, [authReady, user?.id]);
 
   const myPoems = data?.my_posts ?? [];
   const likedByOthers = data?.my_likes_received ?? [];
