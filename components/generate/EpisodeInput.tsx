@@ -1,24 +1,26 @@
 type EpisodeInputProps = {
   value: string;
   onChange: (value: string) => void;
+  error?: string | null;
 };
 
 export default function EpisodeInput({
   value,
   onChange,
+  error,
 }: EpisodeInputProps) {
-  const maxLength = 300;
+  const maxLength = 50;
 
   return (
     <section className="mt-8">
 
-{/* タイトル */}
-<div className="mb-5">
+      {/* タイトル */}
+      <div className="mb-5">
 
-  <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
 
-    <span
-      className="
+          <span
+            className="
         flex
         h-7
         w-7
@@ -31,21 +33,21 @@ export default function EpisodeInput({
         font-bold
         text-white
       "
-    >
-      2
-    </span>
+          >
+            2
+          </span>
 
-    <h2 className="text-xl font-bold text-[#891630]">
-      エピソードを入力
-    </h2>
+          <h2 className="text-xl font-bold text-[#891630]">
+            エピソードを入力
+          </h2>
 
-  </div>
+        </div>
 
-  <p className="ml-[52px] mt-2 text-base text-gray-500">
-  選んだテーマに沿って書いてみよう
-  </p>
+        <p className="ml-[52px] mt-2 text-base text-gray-500">
+          選んだテーマに沿って書いてみよう
+        </p>
 
-</div>
+      </div>
 
       {/* 入力欄 */}
       <textarea
@@ -72,6 +74,12 @@ export default function EpisodeInput({
           focus:ring-[#891630]/20
         "
       />
+
+      {error && (
+        <p className="mt-2 rounded-lg border border-[#f0c6cb] bg-[#fff4f5] px-3 py-2 text-sm text-[#b3263a]">
+          {error}
+        </p>
+      )}
 
       {/* 文字数 */}
       <div className="mt-2 flex justify-end">

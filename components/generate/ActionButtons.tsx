@@ -1,16 +1,19 @@
 import { Send } from "lucide-react";
 
 type ActionButtonsProps = {
-  onPost: () => void;
+  onPost: () => void | Promise<void>;
+  posting?: boolean;
 };
 
 export default function ActionButtons({
   onPost,
+  posting = false,
 }: ActionButtonsProps) {
   return (
     <div className="mt-6">
       <button
         onClick={onPost}
+        disabled={posting}
         className="
           flex
           w-full
@@ -24,10 +27,12 @@ export default function ActionButtons({
           text-white
           transition
           hover:bg-[#7A1A21]
+          disabled:cursor-not-allowed
+          disabled:opacity-70
         "
       >
         <Send size={20} />
-        投稿
+        {posting ? "投稿中..." : "投稿"}
       </button>
     </div>
   );

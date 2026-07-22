@@ -11,6 +11,9 @@ const themes = [
   "上司あるある",
   "残業あるある",
   "新人あるある",
+  "在宅あるある",
+  "通勤あるある",
+  "転職あるある",
 ];
 
 export default function ThemeSelector({

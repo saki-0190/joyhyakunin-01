@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Header from "@/components/Header";
+import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 
 import ThemeSelector from "@/components/generate/ThemeSelector";
 import EpisodeInput from "@/components/generate/EpisodeInput";
@@ -19,12 +21,16 @@ const illustrations = [
 ];
 
 export default function GeneratePage() {
+  const router = useRouter();
   const [selectedTheme, setSelectedTheme] =
     useState("営業あるある");
 
   const [episode, setEpisode] = useState("");
+  const [episodeError, setEpisodeError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [postToast, setPostToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const [poem, setPoem] = useState("");
 
@@ -32,7 +38,25 @@ export default function GeneratePage() {
     illustrations[0]
   );
 
+  useEffect(() => {
+    if (!postToast) return;
+
+    const timerId = setTimeout(() => {
+      setPostToast(null);
+    }, 2200);
+
+    return () => clearTimeout(timerId);
+  }, [postToast]);
+
   const handleGenerate = async () => {
+    const trimmedEpisode = episode.trim();
+    if (!trimmedEpisode) {
+      setEpisodeError("エピソードを入力してください（50文字以内）");
+      return;
+    }
+
+    setEpisodeError(null);
+    setPostToast(null);
     setLoading(true);
 
     try {
@@ -43,7 +67,7 @@ export default function GeneratePage() {
         },
         body: JSON.stringify({
           theme: selectedTheme,
-          episode,
+          episode: trimmedEpisode,
         }),
       });
 
@@ -61,7 +85,10 @@ export default function GeneratePage() {
       setIllustration(random);
     } catch (error) {
       console.error(error);
-      alert("一首の生成に失敗しました。もう一度お試しください。");
+      setPostToast({
+        type: "error",
+        message: "一首の生成に失敗しました。もう一度お試しください。",
+      });
     } finally {
       setLoading(false);
     }
@@ -72,7 +99,7 @@ export default function GeneratePage() {
       <Header />
 
       <main className="min-h-screen bg-[#F8F6F2] pb-24">
-        <div className="mx-auto max-w-md px-5 py-6">
+        <div className="mx-auto max-w-xl px-4 py-6">
 
           {/* タイトル */}
           <div className="mb-8 text-center">
@@ -95,7 +122,13 @@ export default function GeneratePage() {
           {/* ②エピソード */}
           <EpisodeInput
             value={episode}
-            onChange={setEpisode}
+            error={episodeError}
+            onChange={(value) => {
+              setEpisode(value);
+              if (value.trim()) {
+                setEpisodeError(null);
+              }
+            }}
           />
 
           {/* ボタン */}
@@ -163,15 +196,28 @@ export default function GeneratePage() {
           {/* アクションボタン */}
           {poem && (
             <ActionButtons
+              posting={posting}
               onPost={async () => {
+                if (posting) return;
+
                 try {
+                  const user = getStoredUser();
+                  const authHeader = getAuthorizationHeader();
+                  if (!user || !authHeader.Authorization) {
+                    router.push("/login");
+                    return;
+                  }
+
+                  setPosting(true);
+                  setPostToast(null);
+
                   const res = await fetch("/api/posts", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
+                      ...authHeader,
                     },
                     body: JSON.stringify({
-                      user_id: 1,
                       poem_text: poem,
                       theme: selectedTheme,
                       image_url: illustration,
@@ -182,10 +228,19 @@ export default function GeneratePage() {
                     throw new Error("投稿に失敗しました");
                   }
 
-                  alert("投稿しました！");
+                  setPostToast({
+                    type: "success",
+                    message: "投稿しました！",
+                  });
+                  setPoem("");
                 } catch (error) {
                   console.error(error);
-                  alert("投稿に失敗しました。もう一度お試しください。");
+                  setPostToast({
+                    type: "error",
+                    message: "投稿に失敗しました。もう一度お試しください。",
+                  });
+                } finally {
+                  setPosting(false);
                 }
               }}
             />
@@ -193,6 +248,19 @@ export default function GeneratePage() {
 
         </div>
       </main>
+
+      {postToast && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center px-4">
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm font-medium shadow-lg ${postToast.type === "error"
+              ? "border-[#f0c6cb] bg-[#fff4f5] text-[#b3263a]"
+              : "border-[#cae7cc] bg-[#f2fbf2] text-[#2f7a37]"
+              }`}
+          >
+            {postToast.message}
+          </div>
+        </div>
+      )}
     </>
   );
 }

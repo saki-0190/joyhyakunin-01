@@ -1,19 +1,26 @@
 import LikeButton from "./LikeButton";
+import Image from "next/image";
 
 type FeedCardProps = {
   postId: number;
   user: string;
+  userImage: string;
   time: string;
   poem: string;
   likes: number;
+  likedByMe?: boolean;
+  onLikeStateChange?: (postId: number, next: { liked: boolean; likes: number }) => void;
 };
 
 export default function FeedCard({
   postId,
   user,
+  userImage,
   time,
   poem,
   likes,
+  likedByMe = false,
+  onLikeStateChange,
 }: FeedCardProps) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
@@ -22,9 +29,13 @@ export default function FeedCard({
       <div className="mb-4 flex items-start gap-3">
 
         {/* アイコン */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-2xl">
-          🎤
-        </div>
+        <Image
+          src={userImage}
+          alt={user}
+          width={48}
+          height={48}
+          className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover"
+        />
 
         <div>
           <h3 className="font-bold text-gray-800">
@@ -59,7 +70,12 @@ export default function FeedCard({
 
       {/* わかる */}
       <div className="mt-4">
-        <LikeButton postId={postId} initialLikes={likes} />
+        <LikeButton
+          postId={postId}
+          initialLikes={likes}
+          initialLiked={likedByMe}
+          onStateChange={(next) => onLikeStateChange?.(postId, next)}
+        />
       </div>
 
     </div>

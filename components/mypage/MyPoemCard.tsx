@@ -13,6 +13,8 @@ type MyPoemCardProps = {
   user?: string;
   time?: string;
   avatar?: string;
+  deleteDisabled?: boolean;
+  deleteLoading?: boolean;
 
   onDownload: () => void;
   onDelete: () => void;
@@ -25,6 +27,8 @@ export default function MyPoemCard({
   user = "たなかっち",
   time = "3時間前",
   avatar = "/images/profile/profile01.png",
+  deleteDisabled = false,
+  deleteLoading = false,
   onDownload,
   onDelete,
 }: MyPoemCardProps) {
@@ -134,6 +138,7 @@ export default function MyPoemCard({
 
         <button
           onClick={onDelete}
+          disabled={deleteDisabled || deleteLoading}
           className="
             flex
             items-center
@@ -147,10 +152,12 @@ export default function MyPoemCard({
             text-white
             transition
             hover:bg-[#7A1A21]
+            disabled:cursor-not-allowed
+            disabled:opacity-60
           "
         >
           <Trash2 size={18} />
-          削除
+          {deleteLoading ? "削除中..." : "削除"}
         </button>
 
       </div>

@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FeedCard from "@/components/feed/FeedCard";
 import FeedTabs from "@/components/feed/FeedTabs";
+import { getAuthorizationHeader } from "@/lib/auth";
+import { formatRelativeTime } from "@/lib/time";
 
 type PostItem = {
   post_id: number;
@@ -13,12 +15,21 @@ type PostItem = {
   theme: string;
   image_url: string;
   likes_count: number;
+  liked_by_me?: boolean;
   created_at: string;
+  author_name?: string;
+  author_image_url?: string;
+};
+
+type LikeUiState = {
+  liked: boolean;
+  likes: number;
 };
 
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState<"popular" | "latest">("latest");
   const [posts, setPosts] = useState<PostItem[]>([]);
+  const [likeUiState, setLikeUiState] = useState<Record<number, LikeUiState>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -37,7 +48,13 @@ export default function FeedPage() {
       setError(null);
 
       try {
-        const res = await fetch(`/api/posts?sort=${activeTab}`);
+        const authHeader = getAuthorizationHeader();
+        const res = await fetch(`/api/posts?sort=${activeTab}`, {
+          headers: {
+            ...authHeader,
+          },
+          cache: "no-store",
+        });
         if (!res.ok) {
           throw new Error("投稿一覧の取得に失敗しました");
         }
@@ -55,24 +72,6 @@ export default function FeedPage() {
 
     fetchPosts();
   }, [activeTab]);
-
-  function parseUtcDate(value: string) {
-    return new Date(/([zZ]|[+\-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`);
-  }
-
-  function formatTime(createdAt: string, nowMs: number) {
-    const date = parseUtcDate(createdAt);
-    const diffMs = nowMs - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    if (diffMinutes < 1) return "たった今";
-    if (diffMinutes < 60) return `${diffMinutes}分前`;
-    if (diffHours < 24) return `${diffHours}時間前`;
-    if (diffHours < 48) return "昨日";
-
-    return `${Math.floor(diffHours / 24)}日前`;
-  }
 
   return (
     <>
@@ -102,16 +101,28 @@ export default function FeedPage() {
                 {error}
               </div>
             ) : posts.length > 0 ? (
-              posts.map((post) => (
-                <FeedCard
-                  key={post.post_id}
-                  postId={post.post_id}
-                  user={`ユーザー${post.user_id}`}
-                  time={formatTime(post.created_at, now)}
-                  poem={post.poem_text}
-                  likes={post.likes_count}
-                />
-              ))
+              posts.map((post) => {
+                const override = likeUiState[post.post_id];
+
+                return (
+                  <FeedCard
+                    key={post.post_id}
+                    postId={post.post_id}
+                    user={post.author_name ?? `ユーザー${post.user_id}`}
+                    userImage={post.author_image_url ?? "/images/profile/profile01.png"}
+                    time={formatRelativeTime(post.created_at, now)}
+                    poem={post.poem_text}
+                    likes={override?.likes ?? post.likes_count}
+                    likedByMe={override?.liked ?? Boolean(post.liked_by_me)}
+                    onLikeStateChange={(changedPostId, next) => {
+                      setLikeUiState((prev) => ({
+                        ...prev,
+                        [changedPostId]: next,
+                      }));
+                    }}
+                  />
+                );
+              })
             ) : (
               <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
                 投稿がありません。
