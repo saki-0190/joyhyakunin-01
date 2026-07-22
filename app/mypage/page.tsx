@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import ProfileCard from "@/components/mypage/ProfileCard";
 import ProfileStats from "@/components/mypage/ProfileStats";
 import MyPoemCard from "@/components/mypage/MyPoemCard";
+import FeedCard from "@/components/feed/FeedCard";
 import { useRouter } from "next/navigation";
 import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 import { formatRelativeTime } from "@/lib/time";
@@ -55,6 +56,11 @@ type MypageResponse = {
   my_likes_received: LikeItem[];
 };
 
+type LikeUiState = {
+  liked: boolean;
+  likes: number;
+};
+
 export default function MyPage() {
   const router = useRouter();
   const [user, setUser] = useState<{
@@ -90,6 +96,7 @@ export default function MyPage() {
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [tab, setTab] = useState<TabType>("myPoems");
+  const [likeUiState, setLikeUiState] = useState<Record<number, LikeUiState>>({});
   const [data, setData] = useState<MypageResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -548,22 +555,52 @@ export default function MyPage() {
               <div className="rounded-2xl bg-white p-6 text-center text-red-500 shadow-sm">
                 {error}
               </div>
+            ) : tab === "myPoems" ? (
+              currentList.length > 0 ? (
+                currentList.map((poem) => (
+                  <MyPoemCard
+                    key={poem.id}
+                    poem={poem.poem}
+                    date={poem.date}
+                    user={poem.user}
+                    avatar={poem.avatar}
+                    time={poem.time}
+                    likes={poem.likes}
+                    deleteDisabled={!poem.canDelete}
+                    deleteLoading={deletingPostId === poem.postId}
+                    onDownload={() => handleSavePoem(poem.poem, poem.postId)}
+                    onDelete={() => requestDeletePoem(poem.postId)}
+                  />
+                ))
+              ) : (
+                <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+                  表示する投稿がありません。
+                </div>
+              )
             ) : currentList.length > 0 ? (
-              currentList.map((poem) => (
-                <MyPoemCard
-                  key={poem.id}
-                  poem={poem.poem}
-                  date={poem.date}
-                  user={poem.user}
-                  avatar={poem.avatar}
-                  time={poem.time}
-                  likes={poem.likes}
-                  deleteDisabled={!poem.canDelete}
-                  deleteLoading={deletingPostId === poem.postId}
-                  onDownload={() => handleSavePoem(poem.poem, poem.postId)}
-                  onDelete={() => requestDeletePoem(poem.postId)}
-                />
-              ))
+              currentList.map((poem) => {
+                const override = likeUiState[poem.postId];
+                const baseLiked = tab === "likesGiven";
+
+                return (
+                  <FeedCard
+                    key={poem.id}
+                    postId={poem.postId}
+                    user={poem.user}
+                    userImage={poem.avatar}
+                    time={poem.time}
+                    poem={poem.poem}
+                    likes={override?.likes ?? poem.likes}
+                    likedByMe={override?.liked ?? baseLiked}
+                    onLikeStateChange={(changedPostId, next) => {
+                      setLikeUiState((prev) => ({
+                        ...prev,
+                        [changedPostId]: next,
+                      }));
+                    }}
+                  />
+                );
+              })
             ) : (
               <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
                 表示する投稿がありません。

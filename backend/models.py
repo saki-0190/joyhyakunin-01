@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, UniqueConstraint
 from sqlalchemy.sql import func
 from backend.database import Base
 
@@ -36,6 +36,9 @@ class Post(Base):
 # ============================================
 class Like(Base):
     __tablename__ = "likes"
+    __table_args__ = (
+        UniqueConstraint("post_id", "user_id", name="ux_likes_post_user"),
+    )
 
     # 主キー
     like_id = Column(Integer, primary_key=True, index=True)

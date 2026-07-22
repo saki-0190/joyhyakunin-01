@@ -8,6 +8,8 @@ type FeedCardProps = {
   time: string;
   poem: string;
   likes: number;
+  likedByMe?: boolean;
+  onLikeStateChange?: (postId: number, next: { liked: boolean; likes: number }) => void;
 };
 
 export default function FeedCard({
@@ -17,6 +19,8 @@ export default function FeedCard({
   time,
   poem,
   likes,
+  likedByMe = false,
+  onLikeStateChange,
 }: FeedCardProps) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
@@ -66,7 +70,12 @@ export default function FeedCard({
 
       {/* わかる */}
       <div className="mt-4">
-        <LikeButton postId={postId} initialLikes={likes} />
+        <LikeButton
+          postId={postId}
+          initialLikes={likes}
+          initialLiked={likedByMe}
+          onStateChange={(next) => onLikeStateChange?.(postId, next)}
+        />
       </div>
 
     </div>

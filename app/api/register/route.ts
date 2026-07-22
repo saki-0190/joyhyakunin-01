@@ -1,22 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBackendUrl } from "@/lib/backendUrl";
 
-type RouteContext = {
-    params: Promise<{ postId: string }>;
-};
-
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function POST(request: NextRequest) {
     try {
         const backendUrl = getBackendUrl();
-        const { postId } = await context.params;
-        const authorization = request.headers.get("authorization");
+        const body = await request.json();
 
-        const response = await fetch(`${backendUrl}/posts/${postId}`, {
-            method: "DELETE",
+        const response = await fetch(`${backendUrl}/register`, {
+            method: "POST",
             headers: {
+                "Content-Type": "application/json",
                 Accept: "application/json",
-                ...(authorization ? { Authorization: authorization } : {}),
             },
+            body: JSON.stringify(body),
             cache: "no-store",
         });
 
@@ -28,13 +24,13 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
         const text = await response.text();
         return NextResponse.json(
-            { error: text || "削除に失敗しました" },
+            { detail: text || "登録に失敗しました" },
             { status: response.status },
         );
     } catch (error) {
-        console.error("Failed to delete post via backend:", error);
+        console.error("Failed to register via backend:", error);
         return NextResponse.json(
-            { error: "バックエンドに接続できません。サーバー起動を確認してください。" },
+            { detail: "バックエンドに接続できません。サーバー起動を確認してください。" },
             { status: 503 },
         );
     }

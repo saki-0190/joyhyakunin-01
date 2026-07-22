@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+import { getBackendUrl } from "@/lib/backendUrl";
 
 type CreatePostRequest = {
     poem_text: string;
@@ -10,12 +9,15 @@ type CreatePostRequest = {
 
 export async function GET(request: NextRequest) {
     try {
+        const backendUrl = getBackendUrl();
         const { searchParams } = new URL(request.url);
         const sort = searchParams.get("sort") === "popular" ? "popular" : "latest";
+        const authorization = request.headers.get("authorization");
 
-        const response = await fetch(`${BACKEND_URL}/posts?sort=${sort}`, {
+        const response = await fetch(`${backendUrl}/posts?sort=${sort}`, {
             headers: {
                 Accept: "application/json",
+                ...(authorization ? { Authorization: authorization } : {}),
             },
             cache: "no-store",
         });
@@ -40,10 +42,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        const backendUrl = getBackendUrl();
         const body = (await request.json()) as CreatePostRequest;
         const authorization = request.headers.get("authorization");
 
-        const response = await fetch(`${BACKEND_URL}/posts`, {
+        const response = await fetch(`${backendUrl}/posts`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

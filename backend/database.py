@@ -65,5 +65,40 @@ def ensure_user_profile_columns() -> None:
             connection.execute(text("UPDATE users SET industry = '' WHERE industry IS NULL"))
 
 
+def ensure_like_uniqueness() -> None:
+    inspector = inspect(engine)
+    table_names = inspector.get_table_names()
+    if "likes" not in table_names or "posts" not in table_names:
+        return
+
+    existing_index_names = {index["name"] for index in inspector.get_indexes("likes")}
+    existing_unique_names = {constraint["name"] for constraint in inspector.get_unique_constraints("likes")}
+
+    with engine.begin() as connection:
+        # Keep the oldest like per (post_id, user_id) and remove accidental duplicates.
+        connection.execute(
+            text(
+                "DELETE FROM likes "
+                "WHERE like_id NOT IN ("
+                "SELECT kept_like_id FROM ("
+                "SELECT MIN(like_id) AS kept_like_id FROM likes GROUP BY post_id, user_id"
+                ") AS dedup"
+                ")"
+            )
+        )
+
+        # Recalculate cached likes_count to match current likes table.
+        connection.execute(
+            text(
+                "UPDATE posts "
+                "SET likes_count = (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.post_id)"
+            )
+        )
+
+        if "ux_likes_post_user" not in existing_index_names and "ux_likes_post_user" not in existing_unique_names:
+            connection.execute(text("CREATE UNIQUE INDEX ux_likes_post_user ON likes (post_id, user_id)"))
+
+
 ensure_profile_image_column()
 ensure_user_profile_columns()
+ensure_like_uniqueness()

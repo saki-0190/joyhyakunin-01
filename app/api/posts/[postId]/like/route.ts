@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+import { getBackendUrl } from "@/lib/backendUrl";
 
 type RouteContext = {
     params: Promise<{ postId: string }>;
@@ -8,10 +7,11 @@ type RouteContext = {
 
 export async function POST(request: NextRequest, context: RouteContext) {
     try {
+        const backendUrl = getBackendUrl();
         const { postId } = await context.params;
         const authorization = request.headers.get("authorization");
 
-        const response = await fetch(`${BACKEND_URL}/posts/${postId}/like`, {
+        const response = await fetch(`${backendUrl}/posts/${postId}/like`, {
             method: "POST",
             headers: {
                 Accept: "application/json",

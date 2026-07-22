@@ -1,7 +1,7 @@
 # ============================================================
 # FastAPI のルーター機能
 # ============================================================
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 
 # ============================================================
@@ -14,7 +14,7 @@ from backend.models import Post, User, Like
 # ============================================================
 from backend.schemas import PostCreate, Post as PostSchema
 from backend.deps import get_db
-from backend.security import get_current_user_id
+from backend.security import get_current_user_id, get_optional_user_id_from_authorization
 
 router = APIRouter()
 
@@ -42,7 +42,13 @@ def create_post(
 # 投稿一覧API（GET /posts）
 # ============================================================
 @router.get("/posts")
-def get_posts(sort: str = "new", db: Session = Depends(get_db)):
+def get_posts(
+    sort: str = "new",
+    db: Session = Depends(get_db),
+    authorization: str | None = Header(default=None),
+):
+    viewer_user_id = get_optional_user_id_from_authorization(authorization)
+
     if sort == "popular":
         posts = db.query(Post).order_by(Post.likes_count.desc()).all()
     else:
@@ -51,6 +57,15 @@ def get_posts(sort: str = "new", db: Session = Depends(get_db)):
     result = []
     for post in posts:
         user = db.query(User).filter(User.id == post.user_id).first()
+        liked_by_me = False
+        if viewer_user_id is not None:
+            liked_by_me = (
+                db.query(Like)
+                .filter(Like.post_id == post.post_id, Like.user_id == viewer_user_id)
+                .first()
+                is not None
+            )
+
         result.append(
             {
                 "post_id": post.post_id,
@@ -59,6 +74,7 @@ def get_posts(sort: str = "new", db: Session = Depends(get_db)):
                 "theme": post.theme,
                 "image_url": post.image_url,
                 "likes_count": post.likes_count,
+                "liked_by_me": liked_by_me,
                 "created_at": post.created_at.isoformat() if post.created_at else None,
                 "author_name": user.nickname if user else f"ユーザー{post.user_id}",
                 "author_image_url": user.profile_image_url if user and user.profile_image_url else "/images/profile/profile01.png",

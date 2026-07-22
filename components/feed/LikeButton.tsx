@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ThumbsUp } from "lucide-react";
 import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
@@ -8,16 +8,33 @@ import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 type LikeButtonProps = {
   postId: number;
   initialLikes: number;
+  initialLiked?: boolean;
+  onStateChange?: (next: { liked: boolean; likes: number }) => void;
+};
+
+type ToggleLikeResponse = {
+  liked?: boolean;
+  likes_count?: number;
 };
 
 export default function LikeButton({
   postId,
   initialLikes,
+  initialLiked = false,
+  onStateChange,
 }: LikeButtonProps) {
   const router = useRouter();
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(initialLiked);
   const [likes, setLikes] = useState(initialLikes);
   const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    setLiked(initialLiked);
+  }, [initialLiked]);
+
+  useEffect(() => {
+    setLikes(initialLikes);
+  }, [initialLikes]);
 
   const handleLike = async () => {
     if (processing) return;
@@ -30,9 +47,13 @@ export default function LikeButton({
     }
 
     setProcessing(true);
-    const nextLikes = liked ? likes - 1 : likes + 1;
+    const previousLiked = liked;
+    const previousLikes = likes;
+    const nextLiked = !liked;
+    const nextLikes = Math.max(0, likes + (nextLiked ? 1 : -1));
     setLikes(nextLikes);
-    setLiked(!liked);
+    setLiked(nextLiked);
+    onStateChange?.({ liked: nextLiked, likes: nextLikes });
 
     try {
       const res = await fetch(`/api/posts/${postId}/like`, {
@@ -44,10 +65,20 @@ export default function LikeButton({
       if (!res.ok) {
         throw new Error("いいね処理に失敗しました");
       }
+
+      const payload = (await res.json().catch(() => ({}))) as ToggleLikeResponse;
+      const confirmedLiked = typeof payload.liked === "boolean" ? payload.liked : nextLiked;
+      const confirmedLikes =
+        typeof payload.likes_count === "number" ? payload.likes_count : nextLikes;
+
+      setLiked(confirmedLiked);
+      setLikes(confirmedLikes);
+      onStateChange?.({ liked: confirmedLiked, likes: confirmedLikes });
     } catch (error) {
       console.error(error);
-      setLikes(liked ? likes + 1 : likes - 1);
-      setLiked(liked);
+      setLikes(previousLikes);
+      setLiked(previousLiked);
+      onStateChange?.({ liked: previousLiked, likes: previousLikes });
     } finally {
       setProcessing(false);
     }

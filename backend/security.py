@@ -76,3 +76,20 @@ def get_current_user_id(authorization: str | None = Header(default=None)) -> int
     if not isinstance(user_id, int):
         raise HTTPException(status_code=401, detail="Invalid token subject")
     return user_id
+
+
+def get_optional_user_id_from_authorization(authorization: str | None) -> int | None:
+    if not authorization:
+        return None
+
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return None
+
+    try:
+        payload = _decode_and_validate_token(token)
+    except HTTPException:
+        return None
+
+    user_id = payload.get("sub")
+    return user_id if isinstance(user_id, int) else None
