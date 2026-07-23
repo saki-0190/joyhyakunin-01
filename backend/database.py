@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -8,24 +10,31 @@ def get_database_url() -> str:
     if DATABASE_URL:
         return DATABASE_URL
 
-    return "mysql+pymysql://tech0:Gen12class3@mysql-gen12-class3.mysql.database.azure.com:3306/joyhyakunin"
+    raise RuntimeError("DATABASE_URL is required. Configure MySQL URL in .env.local or deployment settings.")
 
 
 SQLALCHEMY_DATABASE_URL = get_database_url()
 
 engine_kwargs = {
     "pool_pre_ping": True,
-    "connect_args": {
-        "ssl": {"ssl_ca": "/etc/ssl/cert.pem"},
-    },
 }
+
+parsed_db_url = urlparse(SQLALCHEMY_DATABASE_URL)
+db_scheme = parsed_db_url.scheme.lower()
+
+if db_scheme.startswith("sqlite"):
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+elif db_scheme.startswith("mysql"):
+    engine_kwargs["connect_args"] = {
+        "ssl": {"ssl_ca": "/etc/ssl/cert.pem"},
+        "connect_timeout": 5,
+    }
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 import backend.models  # noqa: F401
-Base.metadata.create_all(bind=engine)
 
 
 def ensure_profile_image_column() -> None:
@@ -99,6 +108,17 @@ def ensure_like_uniqueness() -> None:
             connection.execute(text("CREATE UNIQUE INDEX ux_likes_post_user ON likes (post_id, user_id)"))
 
 
-ensure_profile_image_column()
-ensure_user_profile_columns()
-ensure_like_uniqueness()
+def initialize_database() -> None:
+    Base.metadata.create_all(bind=engine)
+    ensure_profile_image_column()
+    ensure_user_profile_columns()
+    ensure_like_uniqueness()
+
+
+def check_database_connection() -> bool:
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        return False

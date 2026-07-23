@@ -32,6 +32,7 @@ export default function FeedPage() {
   const [likeUiState, setLikeUiState] = useState<Record<number, LikeUiState>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [degraded, setDegraded] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -46,6 +47,7 @@ export default function FeedPage() {
     const fetchPosts = async () => {
       setLoading(true);
       setError(null);
+      setDegraded(false);
 
       try {
         const authHeader = getAuthorizationHeader();
@@ -55,6 +57,11 @@ export default function FeedPage() {
           },
           cache: "no-store",
         });
+
+        if (res.headers.get("x-backend-status") === "503") {
+          setDegraded(true);
+        }
+
         if (!res.ok) {
           throw new Error("投稿一覧の取得に失敗しました");
         }
@@ -90,6 +97,12 @@ export default function FeedPage() {
           <p className="mb-8 text-center text-sm text-gray-400">
             ※投稿内容は個人の創作・発言です
           </p>
+
+          {degraded ? (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-700">
+              いま投稿サーバーが不安定なため、一時的に投稿一覧を表示できない場合があります。
+            </div>
+          ) : null}
 
           <div className="space-y-6">
             {loading ? (

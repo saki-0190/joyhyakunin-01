@@ -23,6 +23,16 @@ export async function GET(request: NextRequest) {
         });
 
         if (!response.ok) {
+            // During transient DB/backend outages, keep feed endpoint stable for UI.
+            if (response.status === 503) {
+                return NextResponse.json([], {
+                    status: 200,
+                    headers: {
+                        "x-backend-status": "503",
+                    },
+                });
+            }
+
             return NextResponse.json(
                 { error: "投稿一覧の取得に失敗しました" },
                 { status: response.status }
@@ -33,10 +43,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(Array.isArray(data) ? data : []);
     } catch (error) {
         console.error("Failed to fetch posts from backend:", error);
-        return NextResponse.json(
-            { error: "バックエンドに接続できません。サーバー起動を確認してください。" },
-            { status: 503 }
-        );
+        return NextResponse.json([], {
+            status: 200,
+            headers: {
+                "x-backend-status": "503",
+            },
+        });
     }
 }
 

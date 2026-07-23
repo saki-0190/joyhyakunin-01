@@ -11,6 +11,7 @@ import FeedCard from "@/components/feed/FeedCard";
 import { useRouter } from "next/navigation";
 import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 import { formatRelativeTime } from "@/lib/time";
+import { downloadPoemImage } from "@/lib/poemImage";
 
 type TabType = "myPoems" | "likesReceived" | "likesGiven";
 
@@ -83,6 +84,7 @@ export default function MyPage() {
   const [editError, setEditError] = useState<string | null>(null);
   const [editLoading, setEditLoading] = useState(false);
   const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
+  const [savingPostId, setSavingPostId] = useState<number | null>(null);
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [tab, setTab] = useState<TabType>("myPoems");
@@ -204,15 +206,28 @@ export default function MyPage() {
     }, 500);
   };
 
-  const handleSavePoem = (poemText: string, id: number) => {
-    const blob = new Blob([poemText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `joyhyakunin-${id}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setToast({ type: "success", message: "句を保存しました" });
+  const handleSavePoem = async (
+    target: HTMLDivElement | null,
+    theme: string,
+    postId: number
+  ) => {
+    if (!target || savingPostId !== null) {
+      return;
+    }
+
+    setSavingPostId(postId);
+    try {
+      await downloadPoemImage({
+        sourceElement: target,
+        theme,
+      });
+      setToast({ type: "success", message: "画像を保存しました！" });
+    } catch (error) {
+      console.error(error);
+      setToast({ type: "error", message: "画像保存に失敗しました。もう一度お試しください。" });
+    } finally {
+      setSavingPostId(null);
+    }
   };
 
   const executeDeletePoem = async (postId: number) => {
@@ -346,6 +361,8 @@ export default function MyPage() {
           id: post.post_id,
           postId: post.post_id,
           poem: post.poem_text,
+          theme: post.theme,
+          illustration: post.image_url,
           time: label,
           date: label,
           likes: post.likes_count,
@@ -361,6 +378,7 @@ export default function MyPage() {
             id: item.like_id,
             postId: item.post.post_id,
             poem: item.post.poem_text,
+            theme: item.post.theme,
             time: label,
             date: label,
             likes: item.post.likes_count,
@@ -375,6 +393,7 @@ export default function MyPage() {
             id: item.like_id,
             postId: item.post.post_id,
             poem: item.post.poem_text,
+            theme: item.post.theme,
             time: label,
             date: label,
             likes: item.post.likes_count,
@@ -574,11 +593,13 @@ export default function MyPage() {
                     date={poem.date}
                     user={poem.user}
                     avatar={poem.avatar}
+                    illustration={poem.illustration}
                     time={poem.time}
                     likes={poem.likes}
                     deleteDisabled={!poem.canDelete}
                     deleteLoading={deletingPostId === poem.postId}
-                    onDownload={() => handleSavePoem(poem.poem, poem.postId)}
+                    downloadLoading={savingPostId === poem.postId}
+                    onDownload={(target) => handleSavePoem(target, poem.theme, poem.postId)}
                     onDelete={() => requestDeletePoem(poem.postId)}
                   />
                 ))

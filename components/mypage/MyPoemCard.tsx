@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useRef } from "react";
 import {
   Download,
   Trash2,
@@ -13,10 +14,12 @@ type MyPoemCardProps = {
   user?: string;
   time?: string;
   avatar?: string;
+  illustration?: string;
   deleteDisabled?: boolean;
   deleteLoading?: boolean;
+  downloadLoading?: boolean;
 
-  onDownload: () => void;
+  onDownload: (target: HTMLDivElement | null) => void | Promise<void>;
   onDelete: () => void;
 };
 
@@ -27,52 +30,57 @@ export default function MyPoemCard({
   user = "たなかっち",
   time = "3時間前",
   avatar = "/images/profile/profile01.png",
+  illustration = "/images/characters/character01.png",
   deleteDisabled = false,
   deleteLoading = false,
+  downloadLoading = false,
   onDownload,
   onDelete,
 }: MyPoemCardProps) {
+  const saveCaptureRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-md">
+      <div>
 
-      {/* ユーザー情報 */}
-      <div className="flex items-center gap-3 p-4">
+        {/* ユーザー情報 */}
+        <div className="flex items-center gap-3 p-4">
 
-        <Image
-          src={avatar}
-          alt={user}
-          width={48}
-          height={48}
-          className="rounded-full bg-[#F4EEFF] object-cover"
-        />
+          <Image
+            src={avatar}
+            alt={user}
+            width={48}
+            height={48}
+            className="rounded-full bg-[#F4EEFF] object-cover"
+          />
 
-        <div>
-          <h3 className="text-xl font-bold text-[#1F2A44]">
-            {user}
-          </h3>
+          <div>
+            <h3 className="text-xl font-bold text-[#1F2A44]">
+              {user}
+            </h3>
 
-          <p className="text-sm text-gray-400">
-            {time}
-          </p>
+            <p className="text-sm text-gray-400">
+              {time}
+            </p>
+          </div>
+
         </div>
 
-      </div>
+        {/* 百人一首カード */}
+        <div className="px-4">
 
-      {/* 百人一首カード */}
-      <div className="px-4">
-
-        <div
-          className="
+          <div
+            className="
             rounded-2xl
             border-4
             border-[#D9C7A1]
             bg-[#FFFDF8]
             p-6
           "
-        >
+          >
 
-          <pre
-            className="
+            <pre
+              className="
               whitespace-pre-wrap
               text-center
               text-xl
@@ -80,41 +88,90 @@ export default function MyPoemCard({
               font-serif
               text-[#3B2F2F]
             "
+            >
+              {poem}
+            </pre>
+
+          </div>
+
+        </div>
+
+        {/* 日付・いいね */}
+        <div className="flex items-center justify-between px-6 py-3">
+
+          <p className="text-base text-gray-500">
+            {date}
+          </p>
+
+          <div className="flex items-center gap-1 text-gray-500">
+
+            <ThumbsUp size={18} />
+
+            <span className="text-base">
+              {likes}
+            </span>
+
+          </div>
+
+        </div>
+
+        {/* 区切り線 */}
+        <div className="mx-4 border-t border-gray-200" />
+      </div>
+
+      <div className="fixed left-[-10000px] top-0 pointer-events-none" aria-hidden="true">
+        <div ref={saveCaptureRef}>
+          <div
+            className="
+              overflow-hidden
+              rounded-xl
+              border-[20px]
+              border-[#385723]
+              bg-[#FFFDF8]
+              shadow-lg
+            "
           >
-            {poem}
-          </pre>
+            <div className="flex flex-col items-center px-8 py-10">
+              <pre
+                className="
+                  mx-auto
+                  whitespace-pre-wrap
+                  font-serif
+                  text-2xl
+                  tracking-widest
+                  text-[#3B2F2F]
+                "
+                style={{
+                  writingMode: "vertical-rl",
+                  textOrientation: "upright",
+                  height: "200px",
+                  lineHeight: "2.5",
+                }}
+              >
+                {poem}
+              </pre>
 
+              <div className="mt-8">
+                <Image
+                  src={illustration}
+                  alt="キャラクター"
+                  width={250}
+                  height={220}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-
       </div>
-
-      {/* 日付・いいね */}
-      <div className="flex items-center justify-between px-6 py-3">
-
-        <p className="text-base text-gray-500">
-          {date}
-        </p>
-
-        <div className="flex items-center gap-1 text-gray-500">
-
-          <ThumbsUp size={18} />
-
-          <span className="text-base">
-            {likes}
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* 区切り線 */}
-      <div className="mx-4 border-t border-gray-200" />
 
       {/* ボタン */}
       <div className="grid grid-cols-2 gap-3 p-4">
 
         <button
-          onClick={onDownload}
+          onClick={() => {
+            void onDownload(saveCaptureRef.current);
+          }}
+          disabled={downloadLoading}
           className="
             flex
             items-center
@@ -130,10 +187,12 @@ export default function MyPoemCard({
             text-[#601419]
             transition
             hover:bg-[#FFF5F5]
+            disabled:cursor-not-allowed
+            disabled:opacity-60
           "
         >
           <Download size={18} />
-          保存
+          {downloadLoading ? "保存中..." : "画像で保存"}
         </button>
 
         <button
