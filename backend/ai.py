@@ -92,7 +92,11 @@ a i i i
 
 def build_poem_prompt(theme: str, episode: str) -> str:
     return (
-        f"#user_input\n{episode}\n"
+        "# user_input\n"
+        f"theme: {theme}\n"
+        f"episode: {episode}\n"
+        "\n"
+        "上記のthemeとepisodeを必ず踏まえて、2行ネタを作成してください。\n"
     )
 
 

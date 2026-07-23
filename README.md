@@ -53,3 +53,24 @@ This repository is published for educational and proof-of-concept (PoC) purposes
 - 所属する会社・団体・組織とは一切関係ありません。
 - 所属組織の見解や方針を示すものではありません。
 - 商用利用を目的としたものではありません。
+
+## Backend (MySQL) 運用メモ
+
+- 本プロジェクトは MySQL を前提にしています。`DATABASE_URL` は必須です。
+- API 起動時に DB 初期化を試行し、接続不可でもプロセス自体は起動を継続します。
+- DB 接続不可時は DB 依存 API が `503` を返します（無応答やクラッシュを回避）。
+
+### ローカル起動前チェック
+
+1. `.env.local` に `DATABASE_URL=mysql+pymysql://...` を設定
+2. バックエンド起動: `uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload`
+3. ヘルスチェック: `GET /health/db`
+	- `{"ok": true, "database": "up"}` なら DB 到達成功
+	- `{"ok": false, "database": "down"}` なら DB 到達失敗
+
+### デプロイ時の再発防止ポイント
+
+1. `DATABASE_URL` を環境変数で必ず注入（未設定で起動しない）
+2. `health/db` を監視対象に追加（死活監視・アラート）
+3. DB 側のFW/許可IP/SSL証明書設定を事前検証
+4. 起動直後のスモークテストに `GET /health/db` と `GET /posts?sort=latest` を追加

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Header from "@/components/Header";
@@ -11,6 +11,7 @@ import EpisodeInput from "@/components/generate/EpisodeInput";
 import GenerateButton from "@/components/generate/GenerateButton";
 import PoemCard from "@/components/generate/PoemCard";
 import ActionButtons from "@/components/generate/ActionButtons";
+import { downloadPoemImage } from "@/lib/poemImage";
 
 const illustrations = [
   "/images/characters/character01.png",
@@ -30,6 +31,7 @@ export default function GeneratePage() {
 
   const [loading, setLoading] = useState(false);
   const [posting, setPosting] = useState(false);
+  const [savingImage, setSavingImage] = useState(false);
   const [postToast, setPostToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const [poem, setPoem] = useState("");
@@ -37,6 +39,7 @@ export default function GeneratePage() {
   const [illustration, setIllustration] = useState(
     illustrations[0]
   );
+  const poemCardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!postToast) return;
@@ -91,6 +94,33 @@ export default function GeneratePage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveImage = async () => {
+    if (!poem || !poemCardRef.current || savingImage) {
+      return;
+    }
+
+    setSavingImage(true);
+    try {
+      await downloadPoemImage({
+        sourceElement: poemCardRef.current,
+        theme: selectedTheme,
+      });
+
+      setPostToast({
+        type: "success",
+        message: "画像を保存しました！",
+      });
+    } catch (error) {
+      console.error(error);
+      setPostToast({
+        type: "error",
+        message: "画像保存に失敗しました。もう一度お試しください。",
+      });
+    } finally {
+      setSavingImage(false);
     }
   };
 
@@ -151,10 +181,12 @@ export default function GeneratePage() {
                 生成された一首
               </h2>
 
-              <PoemCard
-                poem={poem}
-                illustration={illustration}
-              />
+              <div ref={poemCardRef}>
+                <PoemCard
+                  poem={poem}
+                  illustration={illustration}
+                />
+              </div>
 
             </section>
           )}
@@ -196,6 +228,8 @@ export default function GeneratePage() {
           {/* アクションボタン */}
           {poem && (
             <ActionButtons
+              savingImage={savingImage}
+              onSaveImage={handleSaveImage}
               posting={posting}
               onPost={async () => {
                 if (posting) return;

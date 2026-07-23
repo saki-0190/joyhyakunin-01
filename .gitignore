@@ -47,4 +47,5 @@ __pycache__/
 
 # local database
 test.db
+backend/local.db
 
