@@ -37,7 +37,7 @@ export default function ProfileCard({
 
           <div>
 
-            <h2 className="text-2xl font-bold text-[#601419]">
+            <h2 className="text-2xl font-bold text-[#891630]">
               {nickname}
             </h2>
 
@@ -62,7 +62,7 @@ export default function ProfileCard({
             py-2
             text-sm
             font-medium
-            text-[#601419]
+            text-[#891630]
             transition
             hover:bg-[#EFD4DB]
           "

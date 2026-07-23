@@ -103,7 +103,7 @@ export default function GeneratePage() {
 
           {/* タイトル */}
           <div className="mb-8 text-center">
-            <h1 className="text-xl font-bold text-[#891630]">
+            <h1 className="text-xl font-bold text-[#1A1A1A]">
               一首を詠む
             </h1>
 
@@ -144,7 +144,7 @@ export default function GeneratePage() {
             <section className="mt-10">
 
               <h2 className="mb-5 flex items-center gap-3 text-xl font-bold text-[#891630]">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#891630] text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#891630] text-white">
                   3
                 </span>
 
@@ -163,7 +163,7 @@ export default function GeneratePage() {
           {poem && (
             <section className="mt-8">
 
-              <h2 className="mb-3 text-lg font-semibold text-[#601419]">
+              <h2 className="mb-3 text-lg font-semibold text-[#891630]">
                 編集
               </h2>
 
@@ -182,12 +182,12 @@ export default function GeneratePage() {
                   p-4
                   leading-7
                   outline-none
-                  focus:border-[#601419]
+                  focus:border-[#891630]
                 "
               />
 
               <p className="mt-2 text-sm text-gray-500">
-                💡 生成結果は自由に編集できます。
+                生成結果は自由に編集できます。
               </p>
 
             </section>

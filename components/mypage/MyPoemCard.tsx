@@ -33,33 +33,10 @@ export default function MyPoemCard({
   onDelete,
 }: MyPoemCardProps) {
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-md">
-
-      {/* ユーザー情報 */}
-      <div className="flex items-center gap-3 p-4">
-
-        <Image
-          src={avatar}
-          alt={user}
-          width={48}
-          height={48}
-          className="rounded-full bg-[#F4EEFF] object-cover"
-        />
-
-        <div>
-          <h3 className="text-xl font-bold text-[#1F2A44]">
-            {user}
-          </h3>
-
-          <p className="text-sm text-gray-400">
-            {time}
-          </p>
-        </div>
-
-      </div>
+    <div className="overflow-hidden border border-gray-200 bg-white">
 
       {/* 百人一首カード */}
-      <div className="px-4">
+      <div className="px-4 py-6">
 
         <div
           className="
@@ -107,9 +84,6 @@ export default function MyPoemCard({
 
       </div>
 
-      {/* 区切り線 */}
-      <div className="mx-4 border-t border-gray-200" />
-
       {/* ボタン */}
       <div className="grid grid-cols-2 gap-3 p-4">
 
@@ -121,13 +95,13 @@ export default function MyPoemCard({
             justify-center
             gap-2
             rounded-xl
-            border
-            border-[#601419]
+            border-2
+            border-[#891630]
             bg-white
             py-2
             text-base
             font-semibold
-            text-[#601419]
+            text-[#891630]
             transition
             hover:bg-[#FFF5F5]
           "
@@ -145,7 +119,7 @@ export default function MyPoemCard({
             justify-center
             gap-2
             rounded-xl
-            bg-[#601419]
+            bg-[#891630]
             py-2
             text-base
             font-semibold

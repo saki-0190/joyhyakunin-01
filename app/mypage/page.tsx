@@ -5,9 +5,9 @@ import Image from "next/image";
 
 import Header from "@/components/Header";
 import ProfileCard from "@/components/mypage/ProfileCard";
-import ProfileStats from "@/components/mypage/ProfileStats";
 import MyPoemCard from "@/components/mypage/MyPoemCard";
 import FeedCard from "@/components/feed/FeedCard";
+import MypageTabs from "@/components/mypage/MypageTabs";
 import { useRouter } from "next/navigation";
 import { getAuthorizationHeader, getStoredUser } from "@/lib/auth";
 import { formatRelativeTime } from "@/lib/time";
@@ -28,11 +28,11 @@ type PostItem = {
 
 const profileImageOptions = [
   "/images/profile/profile01.png",
-  "/images/characters/character01.png",
-  "/images/characters/character02.png",
-  "/images/characters/character03.png",
-  "/images/characters/character04.png",
-  "/images/characters/character05.png",
+  "/images/profile/profile02.png",
+  "/images/profile/profile03.png",
+  "/images/profile/profile04.png",
+  "/images/profile/profile05.png",
+  "/images/profile/profile06.png",
 ];
 
 type LikeItem = {
@@ -406,7 +406,7 @@ export default function MyPage() {
             onEdit={handleOpenEdit}
           />
 
-          <div className="mt-3 flex justify-end">
+          <div className="mt-3 flex my-4 justify-end">
             <button
               type="button"
               onClick={handleLogout}
@@ -416,9 +416,19 @@ export default function MyPage() {
             </button>
           </div>
 
+          <MypageTabs
+            poemCount={myPoems.length}
+            likesReceived={likedByOthers.length}
+            likesGiven={likedPoems.length}
+            selected={tab}
+            onChange={setTab}
+          />
+
+
+
           {editOpen && (
             <section className="mt-4 rounded-2xl border border-[#E5DCCF] bg-white p-5 shadow-sm">
-              <h3 className="text-lg font-bold text-[#601419]">登録情報を編集</h3>
+              <h3 className="text-lg font-bold text-[#891630]">登録情報を編集</h3>
 
               <div className="mt-4 space-y-3">
                 <div>
@@ -540,29 +550,13 @@ export default function MyPage() {
             </section>
           )}
 
-
-          <ProfileStats
-            poemCount={myPoems.length}
-            likesReceived={likedByOthers.length}
-            likesGiven={likedPoems.length}
-            selected={tab}
-            onChange={setTab}
-          />
-
-          <div className="mt-8 mb-4">
-            <h2 className="text-2xl font-bold text-[#601419]">
-              {title}
-            </h2>
-            <p className="text-sm text-gray-500">{title}一覧</p>
-          </div>
-
-          <div className="space-y-6">
+          <div>
             {loading ? (
-              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-gray-500">
                 マイページを読み込み中です...
               </div>
             ) : error ? (
-              <div className="rounded-2xl bg-white p-6 text-center text-red-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-red-500">
                 {error}
               </div>
             ) : tab === "myPoems" ? (
@@ -583,7 +577,7 @@ export default function MyPage() {
                   />
                 ))
               ) : (
-                <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+                <div className="bg-white p-6 text-center text-gray-500">
                   表示する投稿がありません。
                 </div>
               )
@@ -612,7 +606,7 @@ export default function MyPage() {
                 );
               })
             ) : (
-              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-gray-500">
                 表示する投稿がありません。
               </div>
             )}
@@ -636,7 +630,7 @@ export default function MyPage() {
       {confirmDeletePostId !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/25 px-4 pb-24">
           <div className="w-full max-w-sm rounded-2xl border border-[#E5DCCF] bg-white p-4 shadow-2xl">
-            <p className="text-sm font-semibold text-[#601419]">この句を削除しますか？</p>
+            <p className="text-sm font-semibold text-[#891630]">この句を削除しますか？</p>
             <p className="mt-1 text-sm text-gray-600">削除すると元に戻せません。</p>
 
             <div className="mt-4 flex gap-2">

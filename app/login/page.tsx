@@ -40,11 +40,11 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#fff8ef_0%,_#f6efe7_50%,_#efe4d8_100%)] px-4 py-10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#fff8ef_0%,_#f6efe7_50%,_#efe4d8_100%)] px-4 py-10 pb-24">
       <div className="mx-auto w-full max-w-xl">
         <div className="mb-6 text-center">
           <p className="text-sm font-medium tracking-[0.2em] text-[#8a6b3d]">ENJOY HYAKUNIN ISSHU</p>
-          <h1 className="mt-2 text-3xl font-bold text-[#601419]">ログイン</h1>
+          <h1 className="mt-2 text-3xl font-bold text-[#891630]">ログイン</h1>
           <p className="mt-2 text-sm text-[#6f655a]">アカウントにログインして、投稿や「わかる！」を楽しもう</p>
         </div>
 
@@ -108,7 +108,7 @@ export default function LoginPage() {
           </p>
 
           <div className="mt-6 border-t border-[#f0e6d9] pt-4 text-center">
-            <Link href="/" className="text-sm font-medium text-[#6b6258] hover:text-[#601419]">
+            <Link href="/" className="text-sm font-medium text-[#6b6258] hover:text-[#891630]">
               フィードに戻る
             </Link>
           </div>
