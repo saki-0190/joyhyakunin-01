@@ -9,6 +9,7 @@ type ProfileCardProps = {
   industry: string;
   image: string;
   onEdit: () => void;
+  onLogout: () => void;
 };
 
 export default function ProfileCard({
@@ -17,16 +18,14 @@ export default function ProfileCard({
   industry,
   image,
   onEdit,
+  onLogout,
 }: ProfileCardProps) {
   return (
     <div className="rounded-2xl bg-white p-6 shadow">
-
       {/* 上段 */}
       <div className="flex items-center justify-between">
-
+        {/* 左側 */}
         <div className="flex items-center gap-4">
-
-          {/* アイコン */}
           <Image
             src={image}
             alt={nickname}
@@ -36,43 +35,60 @@ export default function ProfileCard({
           />
 
           <div>
-
-            <h2 className="text-2xl font-bold text-[#601419]">
+            <h2 className="text-2xl font-bold text-[#891630]">
               {nickname}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              {fullName || "未設定"}/{industry || "未設定"}
+              {fullName || "未設定"} / {industry || "未設定"}
             </p>
-
           </div>
-
         </div>
 
-        {/* 編集ボタン */}
-        <button
-          onClick={onEdit}
-          className="
-            flex
-            items-center
-            gap-2
-            rounded-xl
-            bg-[#F6E5EA]
-            px-4
-            py-2
-            text-sm
-            font-medium
-            text-[#601419]
-            transition
-            hover:bg-[#EFD4DB]
-          "
-        >
-          <Pencil size={16} />
-          編集
-        </button>
+        {/* 右側（ボタンを縦並び） */}
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={onEdit}
+            className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              rounded-lg
+              bg-[#F6E5EA]
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-[#891630]
+              transition
+              hover:bg-[#EFD4DB]
+            "
+          >
+            <Pencil size={16} />
+            編集
+          </button>
 
+          <button
+            onClick={onLogout}
+            className="
+              rounded-lg
+              border
+              border-[#891630]
+              bg-white
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-[#891630]
+              transition
+              hover:bg-[#FAF6F7]
+            "
+          >
+            ログアウト
+          </button>
+        </div>
       </div>
-
     </div>
   );
 }

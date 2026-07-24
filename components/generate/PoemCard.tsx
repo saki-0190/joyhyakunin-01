@@ -10,49 +10,51 @@ export default function PoemCard({
   illustration,
 }: PoemCardProps) {
   return (
-    <div
-      className="
-        overflow-hidden
-        rounded-xl
-        border-[20px]
-        border-[#385723]
-        bg-[#FFFDF8]
-        shadow-lg
-      "
-    >
-      <div className="flex flex-col items-center px-8 py-10">
+    <div className="flex justify-center">
+      <div
+        className="
+          w-[420px]
+          h-[640px]
+          overflow-hidden
+          rounded-xl
+          border-[20px]
+          border-[#385723]
+          bg-[#FFFDF8]
+          shadow-lg
+        "
+      >
+        <div className="flex h-full flex-col items-center px-10 pt-5 pb-0">
+          {/* 一首 */}
+          <pre
+            className="
+              mx-auto
+              whitespace-pre-wrap
+              font-serif
+              text-2xl
+              tracking-widest
+              text-[#3B2F2F]
+            "
+            style={{
+              writingMode: "vertical-rl",
+              textOrientation: "upright",
+              height: "270px",
+              lineHeight: "2.5",
+            }}
+          >
+            {poem}
+          </pre>
 
-        {/* 一首 */}
-        <pre
-          className="
-            whitespace-pre-wrap
-            text-2xl
-            tracking-widest
-            text-[#3B2F2F]
-            font-serif
-            mx-auto
-          "
-          style={{
-            writingMode: "vertical-rl",
-            textOrientation: "upright",
-            height: "200px",
-            lineHeight: "2.5",
-          }}
-        >
-          {poem}
-        </pre>
-
-        {/* イラスト */}
-        <div className="mt-8">
-          <Image
-            src={illustration}
-            alt="キャラクター"
-            width={250}
-            height={220}
-            priority
-          />
+          {/* イラスト */}
+          <div className="mt-auto flex justify-center pb-4">
+            <Image
+              src={illustration}
+              alt="キャラクター"
+              width={280}
+              height={250}
+              priority
+            />
+          </div>
         </div>
-
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import Header from "@/components/Header";
 import ProfileCard from "@/components/mypage/ProfileCard";
-import ProfileStats from "@/components/mypage/ProfileStats";
+import MypageTabs from "@/components/mypage/MypageTabs";
 import MyPoemCard from "@/components/mypage/MyPoemCard";
 import FeedCard from "@/components/feed/FeedCard";
 import { useRouter } from "next/navigation";
@@ -29,11 +29,11 @@ type PostItem = {
 
 const profileImageOptions = [
   "/images/profile/profile01.png",
-  "/images/characters/character01.png",
-  "/images/characters/character02.png",
-  "/images/characters/character03.png",
-  "/images/characters/character04.png",
-  "/images/characters/character05.png",
+  "/images/profile/profile02.png",
+  "/images/profile/profile03.png",
+  "/images/profile/profile04.png",
+  "/images/profile/profile05.png",
+  "/images/profile/profile06.png",
 ];
 
 type LikeItem = {
@@ -403,13 +403,6 @@ export default function MyPage() {
           };
         });
 
-  const title =
-    tab === "myPoems"
-      ? "詠んだ首"
-      : tab === "likesReceived"
-        ? "わかる！された首"
-        : "わかる！した首";
-
   return (
     <>
       <Header />
@@ -417,27 +410,20 @@ export default function MyPage() {
       <main className="min-h-screen bg-[#F8F6F2] pb-24">
         <div className="mx-auto max-w-xl px-4 py-6">
 
-          <ProfileCard
-            nickname={user?.nickname ?? "ゲスト"}
-            fullName={user?.full_name ?? ""}
-            industry={user?.industry ?? ""}
-            image={user?.profile_image_url ?? "/images/profile/profile01.png"}
-            onEdit={handleOpenEdit}
+      <div className="mb-6">
+         <ProfileCard
+          nickname={user?.nickname ?? "ゲスト"}
+          fullName={user?.full_name ?? ""}
+          industry={user?.industry ?? ""}
+          image={user?.profile_image_url ?? "/images/profile/profile01.png"}
+          onEdit={handleOpenEdit}
+         onLogout={handleLogout}
           />
-
-          <div className="mt-3 flex justify-end">
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg border border-[#C9B7BC] bg-white px-3 py-2 text-sm font-medium text-[#6C3640] transition hover:bg-[#F9F1F3]"
-            >
-              ログアウト
-            </button>
-          </div>
+      </div>
 
           {editOpen && (
-            <section className="mt-4 rounded-2xl border border-[#E5DCCF] bg-white p-5 shadow-sm">
-              <h3 className="text-lg font-bold text-[#601419]">登録情報を編集</h3>
+            <section className="mt-4 border border-[#E5DCCF] bg-white p-5">
+              <h3 className="text-lg font-bold text-[#891630]">登録情報を編集</h3>
 
               <div className="mt-4 space-y-3">
                 <div>
@@ -524,7 +510,8 @@ export default function MyPage() {
                             alt="プロフィールアイコン候補"
                             width={56}
                             height={56}
-                            className="h-14 w-14 rounded-lg object-cover"
+                            className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover
+  "
                           />
                         </button>
                       );
@@ -559,29 +546,22 @@ export default function MyPage() {
             </section>
           )}
 
-
-          <ProfileStats
-            poemCount={myPoems.length}
-            likesReceived={likedByOthers.length}
-            likesGiven={likedPoems.length}
+          {/* タブ切り替え */}
+          <MypageTabs
             selected={tab}
+            poemCount={myPoems.length}
+            likesGiven={likedPoems.length}
+            likesReceived={likedByOthers.length}
             onChange={setTab}
           />
 
-          <div className="mt-8 mb-4">
-            <h2 className="text-2xl font-bold text-[#601419]">
-              {title}
-            </h2>
-            <p className="text-sm text-gray-500">{title}一覧</p>
-          </div>
-
-          <div className="space-y-6">
+          <div>
             {loading ? (
-              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-gray-500">
                 マイページを読み込み中です...
               </div>
             ) : error ? (
-              <div className="rounded-2xl bg-white p-6 text-center text-red-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-red-500">
                 {error}
               </div>
             ) : tab === "myPoems" ? (
@@ -592,8 +572,6 @@ export default function MyPage() {
                     poem={poem.poem}
                     date={poem.date}
                     user={poem.user}
-                    avatar={poem.avatar}
-                    illustration={poem.illustration}
                     time={poem.time}
                     likes={poem.likes}
                     deleteDisabled={!poem.canDelete}
@@ -604,7 +582,7 @@ export default function MyPage() {
                   />
                 ))
               ) : (
-                <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+                <div className="bg-white p-6 text-center text-gray-500">
                   表示する投稿がありません。
                 </div>
               )
@@ -633,7 +611,7 @@ export default function MyPage() {
                 );
               })
             ) : (
-              <div className="rounded-2xl bg-white p-6 text-center text-gray-500 shadow-sm">
+              <div className="bg-white p-6 text-center text-gray-500">
                 表示する投稿がありません。
               </div>
             )}
@@ -656,8 +634,8 @@ export default function MyPage() {
 
       {confirmDeletePostId !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/25 px-4 pb-24">
-          <div className="w-full max-w-sm rounded-2xl border border-[#E5DCCF] bg-white p-4 shadow-2xl">
-            <p className="text-sm font-semibold text-[#601419]">この句を削除しますか？</p>
+          <div className="w-full max-w-sm border border-[#E5DCCF] bg-white p-4 shadow-2xl">
+            <p className="text-sm font-semibold text-[#891630]">この句を削除しますか？</p>
             <p className="mt-1 text-sm text-gray-600">削除すると元に戻せません。</p>
 
             <div className="mt-4 flex gap-2">
