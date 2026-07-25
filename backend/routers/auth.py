@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 import bcrypt
 
-from backend.crud.user import find_user_by_email, create_user, find_user_by_id, update_user
-from backend.security import create_access_token, get_current_user_id
+from crud.user import find_user_by_email, create_user, find_user_by_id, update_user
+from security import create_access_token, get_current_user_id
 
 router = APIRouter()
 

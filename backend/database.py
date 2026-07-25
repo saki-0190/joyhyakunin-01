@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from backend.config import DATABASE_URL
+from config import DATABASE_URL
 
 
 def get_database_url() -> str:
@@ -34,7 +34,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-import backend.models  # noqa: F401
+import models  # noqa: F401
 
 
 def ensure_profile_image_column() -> None:

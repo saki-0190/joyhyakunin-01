@@ -7,14 +7,14 @@ from sqlalchemy.orm import Session
 # ============================================================
 # backend パッケージ内の models.py
 # ============================================================
-from backend.models import Post, User, Like
+from models import Post, User, Like
 
 # ============================================================
 # backend パッケージ内の schemas.py
 # ============================================================
-from backend.schemas import PostCreate, Post as PostSchema
-from backend.deps import get_db
-from backend.security import (
+from schemas import PostCreate, Post as PostSchema
+from deps import get_db
+from security import (
     get_current_user_id,
     get_optional_user_id_from_authorization,
 )
