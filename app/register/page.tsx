@@ -2,6 +2,16 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+const profileImageOptions = [
+  "/images/profile/profile01.png",
+  "/images/profile/profile02.png",
+  "/images/profile/profile03.png",
+  "/images/profile/profile04.png",
+  "/images/profile/profile05.png",
+  "/images/profile/profile06.png",
+] as const;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -10,12 +20,43 @@ export default function RegisterPage() {
   const [nickname, setNickname] = useState("");
   const [fullName, setFullName] = useState("");
   const [industry, setIndustry] = useState("");
+  const [profileImageUrl, setProfileImageUrl] =  useState<string>("/images/profile/profile01.png");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const trimmedNickname = nickname.trim();
+    const trimmedFullName = fullName.trim();
+    const trimmedIndustry = industry.trim();
+
+    if (!trimmedNickname) {
+      setError("ニックネームは必須です");
+      return;
+    }
+
+    if (trimmedNickname.length > 10) {
+      setError("ニックネームは10文字以内で入力してください");
+      return;
+    }
+
+    if (trimmedFullName.length > 10) {
+      setError("名前は10文字以内で入力してください");
+      return;
+    }
+
+    if (trimmedIndustry.length > 15) {
+      setError("業種は15文字以内で入力してください");
+      return;
+    }
+
+    if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password)) {
+      setError("パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -25,9 +66,10 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email,
           password,
-          nickname,
-          full_name: fullName,
-          industry,
+          nickname: trimmedNickname,
+          full_name: trimmedFullName,
+          industry: trimmedIndustry,
+          profile_image_url: profileImageUrl,
         }),
       });
 
@@ -36,8 +78,19 @@ export default function RegisterPage() {
         let message = "登録に失敗しました";
 
         if (contentType.includes("application/json")) {
-          const err = (await res.json()) as { detail?: string };
-          message = err.detail || message;
+          const err = (await res.json()) as {
+            detail?:
+            | string
+            | Array<{
+              msg?: string;
+            }>;
+          };
+
+          if (typeof err.detail === "string") {
+            message = err.detail;
+          } else if (Array.isArray(err.detail) && err.detail.length > 0) {
+            message = err.detail[0]?.msg || message;
+          }
         } else {
           const text = await res.text();
           if (text && !text.toLowerCase().includes("internal server error")) {
@@ -99,9 +152,11 @@ export default function RegisterPage() {
                 autoComplete="nickname"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
+                maxLength={10}
                 required
                 className="w-full rounded-xl border border-[#e4d6c2] bg-[#fffdfa] px-4 py-3 text-[#2f2a24] outline-none transition focus:border-[#891630] focus:ring-2 focus:ring-[#f3d9dd]"
               />
+              <p className="mt-1 text-xs text-[#7f7366]">10文字以内・空欄不可</p>
             </div>
 
             <div>
@@ -115,9 +170,11 @@ export default function RegisterPage() {
                 autoComplete="name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                maxLength={10}
                 required
                 className="w-full rounded-xl border border-[#e4d6c2] bg-[#fffdfa] px-4 py-3 text-[#2f2a24] outline-none transition focus:border-[#891630] focus:ring-2 focus:ring-[#f3d9dd]"
               />
+              <p className="mt-1 text-xs text-[#7f7366]">10文字以内</p>
             </div>
 
             <div>
@@ -130,9 +187,41 @@ export default function RegisterPage() {
                 placeholder="製造業"
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
+                maxLength={15}
                 required
                 className="w-full rounded-xl border border-[#e4d6c2] bg-[#fffdfa] px-4 py-3 text-[#2f2a24] outline-none transition focus:border-[#891630] focus:ring-2 focus:ring-[#f3d9dd]"
               />
+              <p className="mt-1 text-xs text-[#7f7366]">15文字以内</p>
+            </div>
+
+            <div>
+              <p className="mb-2 block text-sm font-semibold text-[#4e4338]">アイコン</p>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                {profileImageOptions.map((option) => {
+                  const isSelected = profileImageUrl === option;
+                  return (
+                    <label
+                      key={option}
+                      className={`cursor-pointer rounded-xl border bg-white p-2 transition ${isSelected
+                        ? "border-[#891630] ring-2 ring-[#f3d9dd]"
+                        : "border-[#e4d6c2] hover:border-[#b5868f]"
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        name="profileImage"
+                        value={option}
+                        checked={isSelected}
+                        onChange={(e) => setProfileImageUrl(e.target.value)}
+                        className="sr-only"
+                      />
+                      <div className="relative mx-auto h-12 w-12 overflow-hidden rounded-full">
+                        <Image src={option} alt="プロフィールアイコン" fill className="object-cover" sizes="48px" />
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             <div>
@@ -158,13 +247,16 @@ export default function RegisterPage() {
               <input
                 id="password"
                 type="password"
-                placeholder="8文字以上を推奨"
+                placeholder="英字+数字を含む8文字以上"
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
+                pattern="(?=.*[A-Za-z])(?=.*\d).{8,}"
                 required
                 className="w-full rounded-xl border border-[#e4d6c2] bg-[#fffdfa] px-4 py-3 text-[#2f2a24] outline-none transition focus:border-[#891630] focus:ring-2 focus:ring-[#f3d9dd]"
               />
+              <p className="mt-1 text-xs text-[#7f7366]">8文字以上・英字1文字以上・数字1文字以上</p>
             </div>
           </div>
 

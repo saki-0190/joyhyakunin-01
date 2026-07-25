@@ -9,7 +9,14 @@ def find_user_by_email(email: str):
     finally:
         db.close()
 
-def create_user(email: str, hashed_pw: str, nickname: str, full_name: str, industry: str):
+def create_user(
+    email: str,
+    hashed_pw: str,
+    nickname: str,
+    full_name: str,
+    industry: str,
+    profile_image_url: str = "/images/profile/profile01.png",
+):
     db = SessionLocal()
     try:
         new_user = User(
@@ -18,7 +25,7 @@ def create_user(email: str, hashed_pw: str, nickname: str, full_name: str, indus
             nickname=nickname,
             full_name=full_name,
             industry=industry,
-            profile_image_url="/images/profile/profile01.png",
+            profile_image_url=profile_image_url,
         )
         db.add(new_user)
         try:
