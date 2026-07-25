@@ -58,10 +58,9 @@ export default function MyPoemCard({
             <pre
               className="
               whitespace-pre-wrap
-              text-center
-              text-xl
+              text-lg
               leading-[2]
-              font-serif
+              font-sans
               text-[#3B2F2F]
             "
             >
