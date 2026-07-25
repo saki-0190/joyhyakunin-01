@@ -1,12 +1,12 @@
-import backend.config
+import config
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
-from backend.routers import likes, mypage, posts, auth
-from backend import ai
-from backend.database import check_database_connection, initialize_database
+from routers import likes, mypage, posts, auth
+import ai
+from database import check_database_connection, initialize_database
 
 app = FastAPI()   # ← ここが一番上であることが重要
 

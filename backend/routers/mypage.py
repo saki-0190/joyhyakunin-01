@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 # backend パッケージの DB / モデル
-from backend.models import Post, Like, User
-from backend.deps import get_db
+from models import Post, Like, User
+from deps import get_db
 
 router = APIRouter()
 

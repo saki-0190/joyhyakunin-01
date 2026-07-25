@@ -1,5 +1,5 @@
-from backend.models import User
-from backend.database import SessionLocal
+from models import User
+from database import SessionLocal
 from sqlalchemy.exc import IntegrityError
 
 def find_user_by_email(email: str):

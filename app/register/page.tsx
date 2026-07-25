@@ -79,7 +79,7 @@ export default function RegisterPage() {
       <div className="mx-auto w-full max-w-xl">
         <div className="mb-6 text-center">
           <p className="text-sm font-medium tracking-[0.2em] text-[#8a6b3d]">ENJOY HYAKUNIN ISSHU</p>
-          <h1 className="mt-2 text-3xl font-bold text-[#601419]">新規登録</h1>
+          <h1 className="mt-2 text-3xl font-bold text-[#891630]">新規登録</h1>
           <p className="mt-2 text-sm text-[#6f655a]">アカウントを作成して、投稿や「わかる！」に参加しよう</p>
         </div>
 
@@ -190,7 +190,7 @@ export default function RegisterPage() {
           </p>
 
           <div className="mt-6 border-t border-[#f0e6d9] pt-4 text-center">
-            <Link href="/" className="text-sm font-medium text-[#6b6258] hover:text-[#601419]">
+            <Link href="/" className="text-sm font-medium text-[#6b6258] hover:text-[#891630]">
               フィードに戻る
             </Link>
           </div>

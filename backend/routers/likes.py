@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 # backend パッケージ内の models.py
-from backend.models import Like, Post
+from models import Like, Post
 
-from backend.deps import get_db
-from backend.security import get_current_user_id
+from deps import get_db
+from security import get_current_user_id
 
 router = APIRouter()
 

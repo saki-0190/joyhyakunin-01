@@ -40,34 +40,10 @@ export default function MyPoemCard({
   const saveCaptureRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-md">
+    <div className="overflow-hidden bg-white shadow-md pt-6 border-t border-[#E5E5E5]">
       <div>
-
-        {/* ユーザー情報 */}
-        <div className="flex items-center gap-3 p-4">
-
-          <Image
-            src={avatar}
-            alt={user}
-            width={48}
-            height={48}
-            className="rounded-full bg-[#F4EEFF] object-cover"
-          />
-
-          <div>
-            <h3 className="text-xl font-bold text-[#1F2A44]">
-              {user}
-            </h3>
-
-            <p className="text-sm text-gray-400">
-              {time}
-            </p>
-          </div>
-
-        </div>
-
         {/* 百人一首カード */}
-        <div className="px-4">
+        <div className="px-10">
 
           <div
             className="
@@ -78,7 +54,7 @@ export default function MyPoemCard({
             p-6
           "
           >
-
+            
             <pre
               className="
               whitespace-pre-wrap
@@ -115,8 +91,6 @@ export default function MyPoemCard({
 
         </div>
 
-        {/* 区切り線 */}
-        <div className="mx-4 border-t border-gray-200" />
       </div>
 
       <div className="fixed left-[-10000px] top-0 pointer-events-none" aria-hidden="true">
@@ -165,7 +139,7 @@ export default function MyPoemCard({
       </div>
 
       {/* ボタン */}
-      <div className="grid grid-cols-2 gap-3 p-4">
+      <div className="grid grid-cols-2 gap-3 px-10 py-4">
 
         <button
           onClick={() => {
@@ -179,12 +153,12 @@ export default function MyPoemCard({
             gap-2
             rounded-xl
             border
-            border-[#601419]
+            border-[#891630]
             bg-white
             py-2
             text-base
             font-semibold
-            text-[#601419]
+            text-[#891630]
             transition
             hover:bg-[#FFF5F5]
             disabled:cursor-not-allowed
@@ -204,7 +178,7 @@ export default function MyPoemCard({
             justify-center
             gap-2
             rounded-xl
-            bg-[#601419]
+            bg-[#891630]
             py-2
             text-base
             font-semibold

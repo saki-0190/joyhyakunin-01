@@ -23,7 +23,7 @@ export default function FeedCard({
   onLikeStateChange,
 }: FeedCardProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <div className="border border-gray-200 bg-white p-5">
 
       {/* ユーザー情報 */}
       <div className="mb-4 flex items-start gap-3">
@@ -50,22 +50,21 @@ export default function FeedCard({
       </div>
 
       {/* 一首 */}
-      <div
-        className="
-    rounded-2xl
-    bg-[#F2F2F2]
-    border-2
-    border-[#D9C7A1]
-    shadow-md
-    p-6
-    text-[#3B2F2F]
-  "
-      >
+      <div className="px-4">
+        <div
+            className="
+            rounded-2xl
+            border-4
+            border-[#D9C7A1]
+            bg-[#FFFDF8]
+            p-6
+          "
+          >
 
-        <pre className="whitespace-pre-wrap font-sans text-lg leading-9">
-          {poem}
-        </pre>
-
+          <pre className="whitespace-pre-wrap font-sans text-lg leading-9">
+           {poem}
+          </pre>
+        </div>
       </div>
 
       {/* わかる */}

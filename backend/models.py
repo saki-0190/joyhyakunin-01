@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, UniqueConstraint
 from sqlalchemy.sql import func
-from backend.database import Base
+from database import Base
 
 # ============================================
 # posts テーブル

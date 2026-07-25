@@ -56,7 +56,7 @@ export default function BottomNav() {
               href={item.href}
               onClick={(event) => handleProtectedNavigation(event, item.href)}
               className={`flex flex-col items-center transition-colors ${active
-                ? "text-[#601419]"
+                ? "text-[#891630]"
                 : "text-gray-400 hover:text-gray-600"
                 }`}
             >
