@@ -148,6 +148,27 @@ export default function MyPage() {
       return;
     }
 
+    // 必須チェック
+if (!editNickname.trim()) {
+  setEditError("ニックネームを入力してください");
+  return;
+}
+
+if (!editEmail.trim()) {
+  setEditError("メールアドレスを入力してください");
+  return;
+}
+
+if (!editFullName.trim()) {
+  setEditError("名前を入力してください");
+  return;
+}
+
+if (!editIndustry.trim()) {
+  setEditError("業種を入力してください");
+  return;
+}
+
     setEditLoading(true);
     setEditError(null);
 
@@ -433,8 +454,12 @@ export default function MyPage() {
                   <input
                     id="edit-nickname"
                     type="text"
+                    required
                     value={editNickname}
-                    onChange={(e) => setEditNickname(e.target.value)}
+                    onChange={(e) => {
+                    setEditNickname(e.target.value);
+                      if (editError) setEditError(null);
+                    }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
                 </div>
@@ -447,7 +472,10 @@ export default function MyPage() {
                     id="edit-email"
                     type="email"
                     value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEditEmail(e.target.value);
+                      if (editError) setEditError(null);
+                    }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
                 </div>
@@ -460,7 +488,10 @@ export default function MyPage() {
                     id="edit-full-name"
                     type="text"
                     value={editFullName}
-                    onChange={(e) => setEditFullName(e.target.value)}
+                    onChange={(e) => {
+                      setEditFullName(e.target.value);
+                       if (editError) setEditError(null);
+                     }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
                 </div>
@@ -473,7 +504,10 @@ export default function MyPage() {
                     id="edit-industry"
                     type="text"
                     value={editIndustry}
-                    onChange={(e) => setEditIndustry(e.target.value)}
+                    onChange={(e) => {
+                      setEditIndustry(e.target.value);
+                      if (editError) setEditError(null);
+                    }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
                 </div>
@@ -486,37 +520,58 @@ export default function MyPage() {
                     id="edit-password"
                     type="password"
                     value={editPassword}
-                    onChange={(e) => setEditPassword(e.target.value)}
+                    onChange={(e) => {
+                      setEditPassword(e.target.value);
+                       if (editError) setEditError(null);
+                     }}
                     placeholder="未入力なら変更しません"
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
                 </div>
 
                 <div>
-                  <p className="mb-2 block text-sm font-medium text-gray-700">アイコン</p>
-                  <div className="mx-auto flex w-full justify-center gap-3 overflow-x-auto pb-1">
-                    {profileImageOptions.map((iconUrl) => {
-                      const selected = editProfileImageUrl === iconUrl;
-                      return (
-                        <button
-                          key={iconUrl}
-                          type="button"
-                          onClick={() => setEditProfileImageUrl(iconUrl)}
-                          className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border-2 p-1 transition ${selected ? "border-[#891630]" : "border-transparent hover:border-[#E8D0D5]"
-                            }`}
-                        >
-                          <Image
-                            src={iconUrl}
-                            alt="プロフィールアイコン候補"
-                            width={56}
-                            height={56}
-                            className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover
+<p className="mb-2 block text-sm font-medium text-gray-700">
+  アイコン
+</p>
+
+<div
+  className="
+    mx-auto
+    grid
+    grid-cols-3
+    gap-3
+    justify-items-center
+
+    sm:flex
+    sm:justify-center
+    sm:gap-3
   "
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
+>
+  {profileImageOptions.map((iconUrl) => {
+    const selected = editProfileImageUrl === iconUrl;
+
+    return (
+      <button
+        key={iconUrl}
+        type="button"
+        onClick={() => setEditProfileImageUrl(iconUrl)}
+        className={`flex h-16 w-16 items-center justify-center rounded-xl border-2 p-1 transition ${
+          selected
+            ? "border-[#891630]"
+            : "border-transparent hover:border-[#E8D0D5]"
+        }`}
+      >
+        <Image
+          src={iconUrl}
+          alt="プロフィールアイコン候補"
+          width={56}
+          height={56}
+          className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover"
+        />
+      </button>
+    );
+  })}
+</div>
                 </div>
               </div>
 

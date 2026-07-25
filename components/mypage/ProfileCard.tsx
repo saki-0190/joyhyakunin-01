@@ -21,7 +21,7 @@ export default function ProfileCard({
   onLogout,
 }: ProfileCardProps) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow">
+    <div className="rounded-2xl bg-white p-4 shadow">
       {/* 上段 */}
       <div className="flex items-center justify-between">
         {/* 左側 */}
@@ -76,7 +76,7 @@ export default function ProfileCard({
               border
               border-[#891630]
               bg-white
-              px-4
+              px-2
               py-2
               text-sm
               font-medium
