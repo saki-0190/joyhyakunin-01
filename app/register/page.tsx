@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [nickname, setNickname] = useState("");
   const [fullName, setFullName] = useState("");
   const [industry, setIndustry] = useState("");
-  const [profileImageUrl, setProfileImageUrl] = useState(profileImageOptions[0]);
+  const [profileImageUrl, setProfileImageUrl] =  useState<string>("/images/profile/profile01.png");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
