@@ -169,6 +169,34 @@ if (!editIndustry.trim()) {
   return;
 }
 
+// 文字数チェック
+if (editNickname.length > 10) {
+  setEditError("ニックネームは10文字以内です");
+  return;
+}
+
+if (editFullName.length > 10) {
+  setEditError("名前は10文字以内です");
+  return;
+}
+
+if (editIndustry.length > 15) {
+  setEditError("業種は15文字以内です");
+  return;
+}
+
+// パスワード（入力された場合のみ）
+if (
+  editPassword &&
+  !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(editPassword)
+) {
+  setEditError(
+    "パスワードは8文字以上、英字1文字以上・数字1文字以上で入力してください"
+  );
+  return;
+}
+
+
     setEditLoading(true);
     setEditError(null);
 
@@ -454,14 +482,17 @@ if (!editIndustry.trim()) {
                   <input
                     id="edit-nickname"
                     type="text"
-                    required
                     value={editNickname}
-                    onChange={(e) => {
-                    setEditNickname(e.target.value);
+                    maxLength={10}
+                    required
+                    onChange={(e) => {setEditNickname(e.target.value);
                       if (editError) setEditError(null);
-                    }}
+                      }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
-                  />
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                       10文字以内・空欄不可
+                    </p>
                 </div>
 
                 <div>
@@ -488,12 +519,17 @@ if (!editIndustry.trim()) {
                     id="edit-full-name"
                     type="text"
                     value={editFullName}
+                    maxLength={10}
+                    required
                     onChange={(e) => {
                       setEditFullName(e.target.value);
                        if (editError) setEditError(null);
                      }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    10文字以内
+                  </p>
                 </div>
 
                 <div>
@@ -504,12 +540,17 @@ if (!editIndustry.trim()) {
                     id="edit-industry"
                     type="text"
                     value={editIndustry}
+                    maxLength={15}
+                    required
                     onChange={(e) => {
                       setEditIndustry(e.target.value);
                       if (editError) setEditError(null);
                     }}
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    15文字以内
+                  </p>
                 </div>
 
                 <div>
@@ -520,6 +561,8 @@ if (!editIndustry.trim()) {
                     id="edit-password"
                     type="password"
                     value={editPassword}
+                    minLength={8}
+                    pattern="(?=.*[A-Za-z])(?=.*\d).{8,}"
                     onChange={(e) => {
                       setEditPassword(e.target.value);
                        if (editError) setEditError(null);
@@ -527,51 +570,55 @@ if (!editIndustry.trim()) {
                     placeholder="未入力なら変更しません"
                     className="w-full rounded-xl border border-[#E2D7C8] px-3 py-2 outline-none focus:border-[#891630]"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    8文字以上（英字1文字以上・数字1文字以上）
+                    </p>
                 </div>
 
                 <div>
-<p className="mb-2 block text-sm font-medium text-gray-700">
-  アイコン
-</p>
 
-<div
-  className="
-    mx-auto
-    grid
-    grid-cols-3
-    gap-3
-    justify-items-center
+                <p className="mb-2 block text-sm font-medium text-gray-700">
+                  アイコン
+                </p>
 
-    sm:flex
-    sm:justify-center
-    sm:gap-3
-  "
->
-  {profileImageOptions.map((iconUrl) => {
-    const selected = editProfileImageUrl === iconUrl;
+                <div
+                  className="
+                    mx-auto
+                    grid
+                    grid-cols-3
+                    gap-3
+                    justify-items-center
 
-    return (
-      <button
-        key={iconUrl}
-        type="button"
-        onClick={() => setEditProfileImageUrl(iconUrl)}
-        className={`flex h-16 w-16 items-center justify-center rounded-xl border-2 p-1 transition ${
-          selected
-            ? "border-[#891630]"
-            : "border-transparent hover:border-[#E8D0D5]"
-        }`}
-      >
-        <Image
-          src={iconUrl}
-          alt="プロフィールアイコン候補"
-          width={56}
-          height={56}
-          className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover"
-        />
-      </button>
-    );
-  })}
-</div>
+                    sm:flex
+                    sm:justify-center
+                    sm:gap-3
+                    "
+                    >
+                   {profileImageOptions.map((iconUrl) => {
+                   const selected = editProfileImageUrl === iconUrl;
+
+                    return (
+                    <button
+                        key={iconUrl}
+                        type="button"
+                        onClick={() => setEditProfileImageUrl(iconUrl)}
+                        className={`flex h-16 w-16 items-center justify-center rounded-xl border-2 p-1 transition ${
+                          selected
+                          ? "border-[#891630]"
+                          : "border-transparent hover:border-[#E8D0D5]"
+                          }`}
+                    >
+                    <Image
+                      src={iconUrl}
+                      alt="プロフィールアイコン候補"
+                      width={56}
+                      height={56}
+                      className="h-12 w-12 rounded-full border-2 border-[#F6E5EA] object-cover"
+                    />
+                    </button>
+                  );
+                   })}
+                </div>
                 </div>
               </div>
 
