@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, model_validator
 import bcrypt
+import re
 
 from crud.user import find_user_by_email, create_user, find_user_by_id, update_user
 from security import create_access_token, get_current_user_id
@@ -8,6 +9,7 @@ from security import create_access_token, get_current_user_id
 router = APIRouter()
 
 DUPLICATE_EMAIL_MESSAGE = "そのメールアドレスは既に使用されています"
+PASSWORD_PATTERN = re.compile(r"^(?=.*[A-Za-z])(?=.*\d).{8,}$")
 
 class LoginRequest(BaseModel):
     email: str
@@ -19,6 +21,39 @@ class RegisterRequest(BaseModel):
     nickname: str
     full_name: str
     industry: str
+    profile_image_url: str = "/images/profile/profile01.png"
+
+    @field_validator("nickname")
+    @classmethod
+    def validate_nickname(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("ニックネームは必須です")
+        if len(stripped) > 10:
+            raise ValueError("ニックネームは10文字以内で入力してください")
+        return stripped
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, value: str) -> str:
+        stripped = value.strip()
+        if len(stripped) > 10:
+            raise ValueError("名前は10文字以内で入力してください")
+        return stripped
+
+    @field_validator("industry")
+    @classmethod
+    def validate_industry(cls, value: str) -> str:
+        stripped = value.strip()
+        if len(stripped) > 15:
+            raise ValueError("業種は15文字以内で入力してください")
+        return stripped
+
+    @model_validator(mode="after")
+    def validate_password(self) -> "RegisterRequest":
+        if not PASSWORD_PATTERN.match(self.password):
+            raise ValueError("パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください")
+        return self
 
 class UpdateUserRequest(BaseModel):
     email: str
@@ -47,7 +82,14 @@ def login(req: LoginRequest):
 def register(req: RegisterRequest):
     hashed_pw = bcrypt.hashpw(req.password.encode(), bcrypt.gensalt()).decode()
     try:
-        new_user = create_user(req.email, hashed_pw, req.nickname, req.full_name, req.industry)
+        new_user = create_user(
+            req.email,
+            hashed_pw,
+            req.nickname,
+            req.full_name,
+            req.industry,
+            req.profile_image_url,
+        )
     except ValueError:
         raise HTTPException(status_code=409, detail=DUPLICATE_EMAIL_MESSAGE)
 
