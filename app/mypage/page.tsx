@@ -110,6 +110,15 @@ export default function MyPage() {
     return () => cancelAnimationFrame(frameId);
   }, []);
 
+useEffect(() => {
+  if (!authReady) return;
+
+  if (!user) {
+    router.replace("/login");
+    return;
+  }
+}, [authReady, user, router]);
+
   useEffect(() => {
     if (!toast) return;
 
@@ -287,10 +296,6 @@ export default function MyPage() {
   };
 
   const executeDeletePoem = async (postId: number) => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
 
     const authHeader = getAuthorizationHeader();
     if (!authHeader.Authorization) {
@@ -352,27 +357,17 @@ export default function MyPage() {
 
     const userId = user?.id;
 
+    if (!userId) {
+      setLoading(false);
+    return;
+    }
+
     const fetchMypage = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        if (!userId) {
-          setData({
-            profile: {
-              id: 0,
-              nickname: "ゲスト",
-              email: "",
-              full_name: "",
-              industry: "",
-              profile_image_url: "/images/profile/profile01.png",
-            },
-            my_posts: [],
-            my_likes_given: [],
-            my_likes_received: [],
-          });
-          return;
-        }
+
         const res = await fetch(`/api/mypage/${userId}`);
         if (!res.ok) {
           throw new Error("マイページ情報の取得に失敗しました");
@@ -445,6 +440,7 @@ export default function MyPage() {
         })
         : likedPoems.map((item) => {
           const label = formatRelativeTime(item.created_at, now);
+
           return {
             id: item.like_id,
             postId: item.post.post_id,
@@ -459,7 +455,11 @@ export default function MyPage() {
           };
         });
 
-  return (
+        if (!authReady || !user) {
+          return null;
+        }
+  
+        return (
     <>
       <Header />
 
@@ -467,16 +467,15 @@ export default function MyPage() {
         <div className="mx-auto max-w-xl px-4 py-6">
 
       <div className="mb-6">
-         <ProfileCard
-          nickname={user?.nickname ?? "ゲスト"}
-          fullName={user?.full_name ?? ""}
-          industry={user?.industry ?? ""}
-          image={user?.profile_image_url ?? "/images/profile/profile01.png"}
+        <ProfileCard
+          nickname={user.nickname}
+          fullName={user.full_name ?? ""}
+          industry={user.industry ?? ""}
+          image={user.profile_image_url ?? "/images/profile/profile01.png"}
           onEdit={handleOpenEdit}
-         onLogout={handleLogout}
-          />
-      </div>
-
+          onLogout={handleLogout}
+         />
+        </div>
           {editOpen && (
             <section className="mt-4 border border-[#E5DCCF] bg-white p-5">
               <h3 className="text-lg font-bold text-[#891630]">登録情報を編集</h3>
