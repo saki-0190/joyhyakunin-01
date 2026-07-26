@@ -61,7 +61,7 @@ export default function FeedCard({
           "
           >
 
-          <pre className="whitespace-pre-wrap font-sans text-lg leading-9">
+          <pre className="whitespace-pre-wrap font-sans text-lg leading-9 text-[#1A1A1A]">
            {poem}
           </pre>
         </div>
