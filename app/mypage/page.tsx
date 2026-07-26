@@ -149,53 +149,60 @@ export default function MyPage() {
     }
 
     // 必須チェック
-if (!editNickname.trim()) {
-  setEditError("ニックネームを入力してください");
-  return;
-}
+    if (!editNickname.trim()) {
+      setEditError("ニックネームを入力してください");
+    return;
+    }
 
-if (!editEmail.trim()) {
-  setEditError("メールアドレスを入力してください");
-  return;
-}
+    if (!editEmail.trim()) {
+      setEditError("メールアドレスを入力してください");
+    return;
+    }
 
-if (!editFullName.trim()) {
-  setEditError("名前を入力してください");
-  return;
-}
+    // メールアドレス形式チェック
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-if (!editIndustry.trim()) {
-  setEditError("業種を入力してください");
-  return;
-}
+    if (!emailRegex.test(editEmail)) {
+      setEditError("正しいメールアドレスを入力してください");
+    return;
+    }
 
-// 文字数チェック
-if (editNickname.length > 10) {
-  setEditError("ニックネームは10文字以内です");
-  return;
-}
+    if (!editFullName.trim()) {
+      setEditError("名前を入力してください");
+    return;
+    }
 
-if (editFullName.length > 10) {
-  setEditError("名前は10文字以内です");
-  return;
-}
+    if (!editIndustry.trim()) {
+      setEditError("業種を入力してください");
+    return;
+    }
 
-if (editIndustry.length > 15) {
-  setEditError("業種は15文字以内です");
-  return;
-}
+    // 文字数チェック
+    if (editNickname.length > 10) {
+      setEditError("ニックネームは10文字以内です");
+    return;
+    }
 
-// パスワード（入力された場合のみ）
-if (
-  editPassword &&
-  !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(editPassword)
-) {
-  setEditError(
-    "パスワードは8文字以上、英字1文字以上・数字1文字以上で入力してください"
-  );
-  return;
-}
+    if (editFullName.length > 10) {
+      setEditError("名前は10文字以内です");
+    return;
+    }
 
+    if (editIndustry.length > 15) {
+      setEditError("業種は15文字以内です");
+    return;
+    }
+
+    // パスワード（入力された場合のみ）
+    if (
+      editPassword &&
+      !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(editPassword)
+      ) {
+      setEditError(
+        "パスワードは8文字以上、英字1文字以上・数字1文字以上で入力してください"
+      );
+    return;
+    }
 
     setEditLoading(true);
     setEditError(null);
