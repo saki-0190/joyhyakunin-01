@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
 import bcrypt
 import re
 
@@ -11,12 +11,14 @@ router = APIRouter()
 DUPLICATE_EMAIL_MESSAGE = "そのメールアドレスは既に使用されています"
 PASSWORD_PATTERN = re.compile(r"^(?=.*[A-Za-z])(?=.*\d).{8,}$")
 
+
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
+
 class RegisterRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     nickname: str
     full_name: str
@@ -52,22 +54,61 @@ class RegisterRequest(BaseModel):
     @model_validator(mode="after")
     def validate_password(self) -> "RegisterRequest":
         if not PASSWORD_PATTERN.match(self.password):
-            raise ValueError("パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください")
+            raise ValueError(
+                "パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください"
+            )
         return self
 
+
 class UpdateUserRequest(BaseModel):
-    email: str
+    email: EmailStr
     nickname: str
     full_name: str
     industry: str
     profile_image_url: str
     password: str | None = None
 
+    @field_validator("nickname")
+    @classmethod
+    def validate_nickname(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("ニックネームは必須です")
+        if len(stripped) > 10:
+            raise ValueError("ニックネームは10文字以内で入力してください")
+        return stripped
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, value: str) -> str:
+        stripped = value.strip()
+        if len(stripped) > 10:
+            raise ValueError("名前は10文字以内で入力してください")
+        return stripped
+
+    @field_validator("industry")
+    @classmethod
+    def validate_industry(cls, value: str) -> str:
+        stripped = value.strip()
+        if len(stripped) > 15:
+            raise ValueError("業種は15文字以内で入力してください")
+        return stripped
+
+    @model_validator(mode="after")
+    def validate_password(self) -> "UpdateUserRequest":
+        if self.password and not PASSWORD_PATTERN.match(self.password):
+            raise ValueError(
+                "パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください"
+            )
+        return self
+
+
 @router.post("/login")
 def login(req: LoginRequest):
     user = find_user_by_email(req.email)
     if not user or not bcrypt.checkpw(req.password.encode(), user.password.encode()):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="メールアドレスまたはパスワードが正しくありません")
+
     return {
         "id": user.id,
         "email": user.email,
@@ -78,9 +119,11 @@ def login(req: LoginRequest):
         "access_token": create_access_token(user.id),
     }
 
+
 @router.post("/register")
 def register(req: RegisterRequest):
     hashed_pw = bcrypt.hashpw(req.password.encode(), bcrypt.gensalt()).decode()
+
     try:
         new_user = create_user(
             req.email,
@@ -103,8 +146,13 @@ def register(req: RegisterRequest):
         "access_token": create_access_token(new_user.id),
     }
 
+
 @router.put("/users/{user_id}")
-def edit_user(user_id: int, req: UpdateUserRequest, current_user_id: int = Depends(get_current_user_id)):
+def edit_user(
+    user_id: int,
+    req: UpdateUserRequest,
+    current_user_id: int = Depends(get_current_user_id),
+):
     if current_user_id != user_id:
         raise HTTPException(status_code=403, detail="You cannot edit this user")
 
@@ -129,6 +177,7 @@ def edit_user(user_id: int, req: UpdateUserRequest, current_user_id: int = Depen
         profile_image_url=req.profile_image_url,
         hashed_pw=hashed_pw,
     )
+
     if not updated_user:
         raise HTTPException(status_code=404, detail="User not found")
 

@@ -68,6 +68,12 @@ This repository is published for educational and proof-of-concept (PoC) purposes
 	- `{"ok": true, "database": "up"}` なら DB 到達成功
 	- `{"ok": false, "database": "down"}` なら DB 到達失敗
 
+
+### デプロイ
+1. `frontend(Next.js)` はGithub連携のため、マージ後に自動更新
+2. `backend(FastAPI)` はGithub未連携のため、下記を実行のこと
+　　func azure functionapp publish enjoyhyakuninisshi-api-func
+
 ### デプロイ時の再発防止ポイント
 
 1. `DATABASE_URL` を環境変数で必ず注入（未設定で起動しない）
