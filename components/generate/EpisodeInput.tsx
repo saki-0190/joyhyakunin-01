@@ -66,6 +66,7 @@ export default function EpisodeInput({
           bg-white
           p-4
           text-base
+          text-[#1A1A1A]
           leading-7
           outline-none
           transition
